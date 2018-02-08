@@ -1,0 +1,4 @@
+plugins:
+  site_report_enabled:
+    default: true
+    client: true
