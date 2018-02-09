@@ -20,11 +20,7 @@ class SiteReportMailer < ActionMailer::Base
     emails_report = Report.find(:emails, start_date: start_date, end_date: end_date)
     flags_report = Report.find(:flags, start_date: start_date, end_date: end_date)
     likes_report = Report.find(:likes, start_date: start_date, end_date: end_date)
-    solved_report = Report.find(:post_action, post_action_type: 15, start_date: start_date, end_date: end_date)
-
-
-    puts "REPORTDATACURRENT #{visits_report.total}"
-    puts "REPORTDATAPREV #{visits_report.prev30Days}"
+    accepted_solutions_report = Report.find(:accepted_solutions, start_date: start_date, end_date: end_date)
 
     @data = {
       visits: visits_report.total,
@@ -42,7 +38,7 @@ class SiteReportMailer < ActionMailer::Base
       emails: emails_report.total,
       flags: flags_report.total,
       likes: likes_report.total,
-      # solved: solved_report.total
+      solutions: accepted_solutions_report.total
     }
 
 
