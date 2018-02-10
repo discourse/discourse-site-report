@@ -57,10 +57,11 @@ class SiteReportMailer < ActionMailer::Base
       period_month: period_month,
       title: subject,
       subject: subject,
-
+      header_metadata: header_metadata
     }
+
     admin_emails = User.where(admin: true).map(&:email).select {|e| e.include?('@')}
-    # mail(to: admin_emails, subject: subject)
+    mail(to: admin_emails, subject: subject)
   end
 
   def repeat_new_users(period_start, period_end, num_visits)
@@ -99,7 +100,7 @@ class SiteReportMailer < ActionMailer::Base
   def active_users(period_start, period_end)
     UserVisit.where("visited_at >= :period_start AND visited_at <= :period_end",
                     period_start: period_start,
-                    period_end: period_end).pluck(:user_id).uniq
+                    period_end: period_end).pluck(:user_id).uniq.count
   end
 
   def posts_read(period_start, period_end)
