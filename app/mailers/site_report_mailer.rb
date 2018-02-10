@@ -17,6 +17,7 @@ class SiteReportMailer < ActionMailer::Base
     previous_start_date = 2.months.ago.beginning_of_month
     previous_end_date = 2.months.ago.end_of_month
     period_month = start_date.strftime('%B')
+    days_in_period = end_date.day.to_i
 
     visits = Report.find(:visits, start_date: start_date, end_date: end_date)
     mobile_visits = Report.find(:mobile_visits, start_date: start_date, end_date: end_date)
@@ -31,17 +32,10 @@ class SiteReportMailer < ActionMailer::Base
     likes = Report.find(:likes, start_date: start_date, end_date: end_date)
     accepted_solutions = Report.find(:accepted_solutions, start_date: start_date, end_date: end_date)
 
-    puts "VISITS OBJ #{visits}"
-    p visits
-
-    # @data = {}
-    #
-    # discourse_reports.each do |key, discourse_report|
-    #   @data[key] = create_data(discourse_report.total, discourse_report.prev30Days )
-    # end
-
     active_users_current = active_users(start_date, end_date)
     active_users_previous = active_users(previous_start_date, previous_end_date)
+    daily_average_users_current = daily_average_users(days_in_period, active_users_current)
+    daily_average_users_previous = daily_average_users(30, active_users_previous)
     repeat_new_users_current = repeat_new_users start_date, end_date, 2
     repeat_new_users_previous = repeat_new_users previous_start_date, previous_end_date, 2
     posts_read_current = posts_read(start_date, end_date)
@@ -55,6 +49,15 @@ class SiteReportMailer < ActionMailer::Base
       {key: 'site_report.posts_read', value: posts_read_current}
 
     ]
+
+    health_data = {
+      title_key: 'site_report.health_section_title',
+      fields: [
+        field_hash('active_users', active_users_current, active_users_previous, has_description: true),
+        field_hash( 'daily_active_users', daily_average_users_current, daily_average_users_previous, has_description: true),
+        field_hash('health', health(daily_average_users_current, active_users_current), health(daily_average_users_previous, active_users_previous), has_description: true)
+      ]
+    }
 
     user_data = {
       title_key: 'site_report.users_section_title',
@@ -93,6 +96,7 @@ class SiteReportMailer < ActionMailer::Base
     end
 
     data_array = [
+      health_data,
       user_data,
       user_action_data,
       content_data,
@@ -153,6 +157,19 @@ class SiteReportMailer < ActionMailer::Base
     UserVisit.where("visited_at >= :period_start AND visited_at <= :period_end",
                     period_start: period_start,
                     period_end: period_end).pluck(:posts_read).sum
+  end
+
+  # todo: validate
+  def daily_average_users(days_in_period, active_users)
+    (active_users / days_in_period.to_f).round(2)
+  end
+
+  def health(dau, mau)
+    if mau > 0
+      (dau * 100.0/mau).round(2)
+    else
+      0
+    end
   end
 
   def field_hash(key, current, previous, opts = {})
