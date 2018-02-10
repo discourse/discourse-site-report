@@ -31,6 +31,9 @@ class SiteReportMailer < ActionMailer::Base
     likes = Report.find(:likes, start_date: start_date, end_date: end_date)
     accepted_solutions = Report.find(:accepted_solutions, start_date: start_date, end_date: end_date)
 
+    puts "VISITS OBJ #{visits}"
+    p visits
+
     # @data = {}
     #
     # discourse_reports.each do |key, discourse_report|
@@ -47,9 +50,9 @@ class SiteReportMailer < ActionMailer::Base
     # @data[:repeat_new_users] = create_data(repeat_new_users, previous_repeat_new_users)
 
     header_metadata = [
-      { key: 'site_report.active_users', value: active_users_current },
-      { key: 'site_report.posts', value: posts.total },
-      { key: 'site_report.posts_read', value: posts_read_current }
+      {key: 'site_report.active_users', value: active_users_current},
+      {key: 'site_report.posts', value: total_from_data(posts.data)},
+      {key: 'site_report.posts_read', value: posts_read_current}
 
     ]
 
@@ -57,8 +60,9 @@ class SiteReportMailer < ActionMailer::Base
       title_key: 'site_report.users_section_title',
       fields: [
         field_hash('all_users', all_users(end_date), all_users(previous_end_date), has_description: true),
-        field_hash('user_visits', visits.total, visits.prev30Days, has_description: true),
-        field_hash('new_users', signups.total, signups.prev30Days, has_description: true),
+        field_hash('user_visits', total_from_data(visits.data), visits.prev30Days, has_description: true),
+        field_hash('mobile_visits', total_from_data(mobile_visits.data), mobile_visits.prev30Days, has_description: true),
+        field_hash('new_users', total_from_data(signups.data), signups.prev30Days, has_description: true),
         field_hash('repeat_new_users', repeat_new_users_current, repeat_new_users_previous, has_description: true),
       ]
     }
@@ -67,21 +71,31 @@ class SiteReportMailer < ActionMailer::Base
       title_key: 'site_report.user_actions_title',
       fields: [
         field_hash('posts_read', posts_read_current, posts_read_previous, has_description: true),
-        field_hash( 'posts_liked', likes.total, likes.prev30Days, has_description: true),
-        field_hash('posts_flagged', flags.total, flags.prev30Days, has_description: true),
+        field_hash('posts_liked', total_from_data(likes.data), likes.prev30Days, has_description: true),
+        field_hash('posts_flagged', total_from_data(flags.data), flags.prev30Days, has_description: true),
+        field_hash('response_time', average_from_data(time_to_first_response.data), time_to_first_response.prev30Days, has_description: true),
 
       ]
     }
 
+    content_data = {
+      title_key: 'site_report.content_section_title',
+      fields: [
+        field_hash('topics_created', total_from_data(topics.data), topics.prev30Days, has_description: true),
+        field_hash('posts_created', total_from_data(posts.data), posts.prev30Days, has_description: true),
+        field_hash('emails_sent', total_from_data(emails.data), emails.prev30Days, has_description: true),
+      ]
+    }
 
 
     if accepted_solutions
-      user_action_data[:fields] << field_hash('solutions', accepted_solutions.total, accepted_solutions.prev30Days, has_description: true)
+      user_action_data[:fields] << field_hash('solutions', total_from_data(accepted_solutions.data), accepted_solutions.prev30Days, has_description: true)
     end
 
     data_array = [
       user_data,
       user_action_data,
+      content_data,
     ]
 
     @data = {
@@ -149,5 +163,16 @@ class SiteReportMailer < ActionMailer::Base
       description_key: opts[:has_description] ? "site_report.descriptions.#{key}" : nil,
       hide: false
     }
+  end
+
+  def total_from_data(data)
+    data.each.pluck(:y).sum
+  end
+
+  # todo: validate!
+  def average_from_data(data)
+    responses = data.count
+    total = data.each.pluck(:y).sum
+    (total / responses).round(2)
   end
 end
