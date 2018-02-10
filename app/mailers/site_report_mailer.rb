@@ -53,11 +53,43 @@ class SiteReportMailer < ActionMailer::Base
 
     ]
 
+    user_data = {
+      title_key: 'site_report.users_section_title',
+      fields: [
+        field_hash('all_users', all_users(end_date), all_users(previous_end_date), has_description: true),
+        field_hash('user_visits', visits.total, visits.prev30Days, has_description: true),
+        field_hash('new_users', signups.total, signups.prev30Days, has_description: true),
+        field_hash('repeat_new_users', repeat_new_users_current, repeat_new_users_previous, has_description: true),
+      ]
+    }
+
+    user_action_data = {
+      title_key: 'site_report.user_actions_title',
+      fields: [
+        field_hash('posts_read', posts_read_current, posts_read_previous, has_description: true),
+        field_hash( 'posts_liked', likes.total, likes.prev30Days, has_description: true),
+        field_hash('posts_flagged', flags.total, flags.prev30Days, has_description: true),
+
+      ]
+    }
+
+
+
+    if accepted_solutions
+      user_action_data[:fields] << field_hash('solutions', accepted_solutions.total, accepted_solutions.prev30Days, has_description: true)
+    end
+
+    data_array = [
+      user_data,
+      user_action_data,
+    ]
+
     @data = {
       period_month: period_month,
       title: subject,
       subject: subject,
-      header_metadata: header_metadata
+      header_metadata: header_metadata,
+      data_array: data_array
     }
 
     admin_emails = User.where(admin: true).map(&:email).select {|e| e.include?('@')}
@@ -93,8 +125,8 @@ class SiteReportMailer < ActionMailer::Base
     ActiveRecord::Base.exec_sql(sql, period_start: period_start, period_end: period_end, num_visits: num_visits).count
   end
 
-  def all_users
-    User.all.uniq.count
+  def all_users(end_date)
+    User.where("created_at <= ?", end_date).count
   end
 
   def active_users(period_start, period_end)
@@ -109,10 +141,13 @@ class SiteReportMailer < ActionMailer::Base
                     period_end: period_end).pluck(:posts_read).sum
   end
 
-  def create_data(current, previous)
+  def field_hash(key, current, previous, opts = {})
     {
+      key: "site_report.#{key}",
       value: current,
       compare: previous,
+      description_key: opts[:has_description] ? "site_report.descriptions.#{key}" : nil,
+      hide: false
     }
   end
 end
