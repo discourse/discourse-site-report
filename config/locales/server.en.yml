@@ -2,3 +2,7 @@ en:
   site_settings:
     site_report_enabled: "Enable the site report."
   site_report:
+    title: "Key Statistics for"
+    active_users: "Active Users"
+    posts: "Posts"
+    posts_read: "Posts Read"

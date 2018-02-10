@@ -57,7 +57,7 @@ module SiteReportHelper
     months_ago.month.ago.strftime('%B %Y')
   end
 
-  def site_report_title(months_ago)
+  def site_report_title(months_ago = 1)
     "#{I18n.t('statistics_digest.title')} #{report_date(months_ago)}"
   end
 

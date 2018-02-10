@@ -4,8 +4,6 @@ module ::Jobs
     sidekiq_options 'retry' => true, 'queue' => 'critical'
 
     def execute(args)
-      puts "WE ARE EXECUTING THE SITE REPORT JOB"
-
       SiteReportMailer.report.deliver_now
     end
   end
