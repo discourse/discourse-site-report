@@ -2,8 +2,8 @@ require_dependency 'report'
 require_relative '../helpers/site_report_helper'
 
 class SiteReportMailer < ActionMailer::Base
-  attr_accessor :score
-  @@score = 0
+  attr_accessor :hide_count
+  @@hide_count = 0
 
   include Rails.application.routes.url_helpers
   include ApplicationHelper
@@ -53,6 +53,12 @@ class SiteReportMailer < ActionMailer::Base
       {key: 'site_report.posts', value: total_from_data(posts.data)},
       {key: 'site_report.posts_read', value: posts_read_current}
 
+    ]
+
+    health_fields = [
+      field_hash('active_users', active_users_current, active_users_previous, has_description: true),
+      field_hash( 'daily_active_users', daily_average_users_current, daily_average_users_previous, has_description: true),
+      field_hash('health', health(daily_average_users_current, active_users_current), health(daily_average_users_previous, active_users_previous), has_description: true)
     ]
 
     health_data = {
@@ -116,13 +122,13 @@ class SiteReportMailer < ActionMailer::Base
       data_array: data_array
     }
 
+    puts "HEALTHHIDE #{@@health_hide_count}"
+
     admin_emails = User.where(admin: true).map(&:email).select {|e| e.include?('@')}
     mail(to: admin_emails, subject: subject)
   end
 
   def user_visits(start_date, end_date)
-    @@score += 1
-    puts "score #{@@score}"
     UserVisit.where("visited_at >= :start_date AND visited_at <= :end_date", start_date: start_date, end_date: end_date).count
   end
 
@@ -186,14 +192,16 @@ class SiteReportMailer < ActionMailer::Base
 
   def field_hash(key, current, previous, opts = {})
     compare_value = compare(current, previous)
+    hide = opts[:negative_compare] ? compare_value && compare_value > 10.0 : compare_value && compare_value < 1100.0
+    @@hide_count += 1 if hide
 
-    {
+    return {
       key: "site_report.#{key}",
       value: current,
       compare: format_compare(compare_value),
       description_key: opts[:has_description] ? "site_report.descriptions.#{key}" : nil,
-      hide: opts[:negative_compare] ? compare_value && compare_value > 10.0 : compare_value && compare_value < -10.0
-    }
+      hide: hide
+    } unless hide
   end
 
   def compare(current, previous)
