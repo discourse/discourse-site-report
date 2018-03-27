@@ -190,11 +190,12 @@ class SiteReportMailer < ActionMailer::Base
   end
 
   def compare(current, previous)
-    return "site_report.no_data_available" if previous == 0
-
+    return I18n.t("site_report.no_data_available") if previous == 0
     return 0 if current == previous
 
-    (((current - previous) * 100.0) / previous).round(2)
+    diff = (((current - previous) * 100.0) / previous).round(2)
+
+    sprintf("%+d%", diff)
   end
 
   def total_from_data(data)
