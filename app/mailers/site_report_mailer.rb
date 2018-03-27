@@ -2,8 +2,12 @@ require_dependency 'report'
 require_relative '../helpers/site_report_helper'
 
 class SiteReportMailer < ActionMailer::Base
-  attr_accessor :hide_count
+  attr_accessor :hide_count, :hide_health_section, :hide_users_section, :hide_content_section, :hide_user_actions_section
   @@hide_count = 0
+  @@hide_health_section = true
+  @@hide_users_section = true
+  @@hide_content_section = true
+  @@hide_user_actions_section = true
 
   include Rails.application.routes.url_helpers
   include ApplicationHelper
@@ -56,56 +60,60 @@ class SiteReportMailer < ActionMailer::Base
     ]
 
     health_fields = [
-      field_hash('active_users', active_users_current, active_users_previous, has_description: true),
-      field_hash( 'daily_active_users', daily_average_users_current, daily_average_users_previous, has_description: true),
-      field_hash('health', health(daily_average_users_current, active_users_current), health(daily_average_users_previous, active_users_previous), has_description: true)
+      health_field_hash('active_users', active_users_current, active_users_previous, has_description: true),
+      health_field_hash( 'daily_active_users', daily_average_users_current, daily_average_users_previous, has_description: true),
+      health_field_hash('health', health(daily_average_users_current, active_users_current), health(daily_average_users_previous, active_users_previous), has_description: true)
     ]
 
     health_data =  {
       title_key: 'site_report.health_section_title',
+      hide_section: @@hide_health_section,
       fields: health_fields
-    } if health_fields.any?
+    }
 
     user_fields = [
-      field_hash('all_users', all_users(end_date), all_users(previous_end_date), has_description: true),
+      users_field_hash('all_users', all_users(end_date), all_users(previous_end_date), has_description: true),
       # field_hash('user_visits', total_from_data(visits.data), visits.prev30Days, has_description: true),
-      field_hash('user_visits', period_visits, prev_period_visits, has_description: true),
-      field_hash('mobile_visits', total_from_data(mobile_visits.data), mobile_visits.prev30Days, has_description: true),
-      field_hash('new_users', total_from_data(signups.data), signups.prev30Days, has_description: true),
-      field_hash('repeat_new_users', repeat_new_users_current, repeat_new_users_previous, has_description: true),
+      users_field_hash('user_visits', period_visits, prev_period_visits, has_description: true),
+      users_field_hash('mobile_visits', total_from_data(mobile_visits.data), mobile_visits.prev30Days, has_description: true),
+      users_field_hash('new_users', total_from_data(signups.data), signups.prev30Days, has_description: true),
+      users_field_hash('repeat_new_users', repeat_new_users_current, repeat_new_users_previous, has_description: true),
     ]
 
     user_data = {
       title_key: 'site_report.users_section_title',
+      hide_section: @@hide_users_section,
       fields: user_fields
-    } if user_fields.any?
+    }
 
     user_action_fields = [
-      field_hash('posts_read', posts_read_current, posts_read_previous, has_description: true),
-      field_hash('posts_liked', total_from_data(likes.data), likes.prev30Days, has_description: true),
-      field_hash('posts_flagged', total_from_data(flags.data), flags.prev30Days, has_description: true),
-      field_hash('response_time', average_from_data(time_to_first_response.data), time_to_first_response.prev30Days, has_description: true),
+      user_actions_field_hash('posts_read', posts_read_current, posts_read_previous, has_description: true),
+      user_actions_field_hash('posts_liked', total_from_data(likes.data), likes.prev30Days, has_description: true),
+      user_actions_field_hash('posts_flagged', total_from_data(flags.data), flags.prev30Days, has_description: true),
+      user_actions_field_hash('response_time', average_from_data(time_to_first_response.data), time_to_first_response.prev30Days, has_description: true),
     ]
 
     if accepted_solutions
-      user_action_fields << field_hash('solutions', total_from_data(accepted_solutions.data), accepted_solutions.prev30Days, has_description: true)
+      user_action_fields << user_actions_field_hash('solutions', total_from_data(accepted_solutions.data), accepted_solutions.prev30Days, has_description: true)
     end
 
     user_action_data = {
       title_key: 'site_report.user_actions_title',
+      hide_section: @@hide_user_actions_section,
       fields: user_action_fields
-    } if user_action_fields.any?
+    }
 
     content_fields = [
-      field_hash('topics_created', total_from_data(topics.data), topics.prev30Days, has_description: true),
-      field_hash('posts_created', total_from_data(posts.data), posts.prev30Days, has_description: true),
-      field_hash('emails_sent', total_from_data(emails.data), emails.prev30Days, has_description: true),
+      content_field_hash('topics_created', total_from_data(topics.data), topics.prev30Days, has_description: true),
+      content_field_hash('posts_created', total_from_data(posts.data), posts.prev30Days, has_description: true),
+      content_field_hash('emails_sent', total_from_data(emails.data), emails.prev30Days, has_description: true),
     ]
 
     content_data = {
       title_key: 'site_report.content_section_title',
+      hide_section: @@hide_content_section,
       fields: content_fields
-    } if content_fields.any?
+    }
 
     data_array = [
       health_data,
@@ -121,8 +129,6 @@ class SiteReportMailer < ActionMailer::Base
       header_metadata: header_metadata,
       data_array: data_array
     }
-
-    puts "DIGEST DATA #{@data}"
 
     admin_emails = User.where(admin: true).map(&:email).select {|e| e.include?('@')}
     mail(to: admin_emails, subject: subject)
@@ -190,21 +196,50 @@ class SiteReportMailer < ActionMailer::Base
     end
   end
 
+  def health_field_hash(key, current, previous, opts = {})
+    field = field_hash(key, current, previous, opts)
+
+    @@hide_health_section = false unless field[:hide]
+
+    field
+  end
+
+  def users_field_hash(key, current, previous, opts = {})
+    field = field_hash(key, current, previous, opts)
+
+    @@hide_users_section = false unless field[:hide]
+
+    field
+  end
+
+  def user_actions_field_hash(key, current, previous, opts = {})
+    field = field_hash(key, current, previous, opts)
+
+    @@hide_user_actions_section = false unless field[:hide]
+
+    field
+  end
+
+  def content_field_hash(key, current, previous, opts = {})
+    field = field_hash(key, current, previous, opts)
+
+    @@hide_content_section = false unless field[:hide]
+
+    field
+  end
+
   def field_hash(key, current, previous, opts = {})
     compare_value = compare(current, previous)
-    hide = opts[:negative_compare] ? compare_value && compare_value > 10.0 : compare_value && compare_value < 1000.0
+    hide = opts[:negative_compare] ? compare_value && compare_value > 10.0 : compare_value && compare_value < 105.0
     @@hide_count += 1 if hide
 
-    field = {
+    {
       key: "site_report.#{key}",
       value: current,
       compare: format_compare(compare_value),
       description_key: opts[:has_description] ? "site_report.descriptions.#{key}" : nil,
       hide: hide
     }
-
-    hide ? nil : field
-
   end
 
   def compare(current, previous)
