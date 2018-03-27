@@ -24,6 +24,7 @@ en:
     topics_created: "Topics Created"
     posts_created: "Posts Created"
     emails_sent: "Emails Sent"
+    no_data_available: "No Data Available"
     descriptions:
       all_users: "This is the all users description."
       new_users: "This is the new users description."
