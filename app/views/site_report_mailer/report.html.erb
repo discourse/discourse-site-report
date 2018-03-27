@@ -88,6 +88,7 @@
 
         <!-- data loop -->
         <% @data[:data_array].each_with_index do |obj, outer_count| -%>
+          <% next unless obj -%>
 
           <!-- title section -->
           <tr>
