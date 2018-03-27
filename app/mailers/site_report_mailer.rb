@@ -19,7 +19,9 @@ class SiteReportMailer < ActionMailer::Base
     period_month = start_date.strftime('%B')
     days_in_period = end_date.day.to_i
 
-    visits = Report.find(:visits, start_date: start_date, end_date: end_date)
+    # visits = Report.find(:visits, start_date: start_date, end_date: end_date)
+    period_visits = user_visits(start_date, end_date)
+    prev_period_visits = user_visits(previous_start_date, previous_end_date)
     mobile_visits = Report.find(:mobile_visits, start_date: start_date, end_date: end_date)
     signups = Report.find(:signups, start_date: start_date, end_date: end_date)
     profile_views = Report.find(:profile_views, start_date: start_date, end_date: end_date)
@@ -63,7 +65,8 @@ class SiteReportMailer < ActionMailer::Base
       title_key: 'site_report.users_section_title',
       fields: [
         field_hash('all_users', all_users(end_date), all_users(previous_end_date), has_description: true),
-        field_hash('user_visits', total_from_data(visits.data), visits.prev30Days, has_description: true),
+        # field_hash('user_visits', total_from_data(visits.data), visits.prev30Days, has_description: true),
+        field_hash('user_visits', period_visits, prev_period_visits, has_description: true),
         field_hash('mobile_visits', total_from_data(mobile_visits.data), mobile_visits.prev30Days, has_description: true),
         field_hash('new_users', total_from_data(signups.data), signups.prev30Days, has_description: true),
         field_hash('repeat_new_users', repeat_new_users_current, repeat_new_users_previous, has_description: true),
@@ -112,6 +115,10 @@ class SiteReportMailer < ActionMailer::Base
 
     admin_emails = User.where(admin: true).map(&:email).select {|e| e.include?('@')}
     mail(to: admin_emails, subject: subject)
+  end
+
+  def user_visits(start_date, end_date)
+    UserVisit.where("visited_at >= :start_date AND visited_at <= :end_date", start_date: start_date, end_date: end_date).count
   end
 
   def repeat_new_users(period_start, period_end, num_visits)
@@ -176,10 +183,18 @@ class SiteReportMailer < ActionMailer::Base
     {
       key: "site_report.#{key}",
       value: current,
-      compare: previous,
+      compare: compare(current, previous),
       description_key: opts[:has_description] ? "site_report.descriptions.#{key}" : nil,
       hide: false
     }
+  end
+
+  def compare(current, previous)
+    return "site_report.no_data_available" if previous == 0
+
+    return 0 if current == previous
+
+    (((current - previous) * 100.0) / previous).round(2)
   end
 
   def total_from_data(data)
