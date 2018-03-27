@@ -2,6 +2,9 @@ require_dependency 'report'
 require_relative '../helpers/site_report_helper'
 
 class SiteReportMailer < ActionMailer::Base
+  attr_accessor :score
+  @@score = 0
+
   include Rails.application.routes.url_helpers
   include ApplicationHelper
   include SiteReportHelper
@@ -118,6 +121,8 @@ class SiteReportMailer < ActionMailer::Base
   end
 
   def user_visits(start_date, end_date)
+    @@score += 1
+    puts "score #{@@score}"
     UserVisit.where("visited_at >= :start_date AND visited_at <= :end_date", start_date: start_date, end_date: end_date).count
   end
 
@@ -180,22 +185,31 @@ class SiteReportMailer < ActionMailer::Base
   end
 
   def field_hash(key, current, previous, opts = {})
+    compare_value = compare(current, previous)
+
     {
       key: "site_report.#{key}",
       value: current,
-      compare: compare(current, previous),
+      compare: format_compare(compare_value),
       description_key: opts[:has_description] ? "site_report.descriptions.#{key}" : nil,
-      hide: false
+      hide: opts[:negative_compare] ? compare_value && compare_value > 10.0 : compare_value && compare_value < -10.0
     }
   end
 
   def compare(current, previous)
-    return I18n.t("site_report.no_data_available") if previous == 0
+    # return I18n.t("site_report.no_data_available") if previous == 0
+    return nil if previous == 0
     return 0 if current == previous
 
-    diff = (((current - previous) * 100.0) / previous).round(2)
+    (((current - previous) * 100.0) / previous).round(2)
 
-    sprintf("%+d%", diff)
+    # sprintf("%+d%", diff)
+  end
+
+  def format_compare(val)
+    return I18n.t("site_report.no_data_available") if val.nil?
+
+    sprintf("%+d%", val)
   end
 
   def total_from_data(data)
