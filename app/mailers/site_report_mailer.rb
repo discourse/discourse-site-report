@@ -13,7 +13,6 @@ class SiteReportMailer < ActionMailer::Base
   include SiteReportHelper
   helper :application
   add_template_helper SiteReportHelper
-  append_view_path Rails.root.join('plugins', 'discourse-site-report', 'app', 'views')
   default from: SiteSetting.notification_email
 
   def report
@@ -38,9 +37,6 @@ class SiteReportMailer < ActionMailer::Base
     period_time_to_first_response = time_to_first_response(start_date, end_date)
     prev_time_to_first_response = time_to_first_response(previous_start_date, previous_end_date)
 
-    # Todo: this isn't being used.
-    period_topics_with_no_response = topics_with_no_response(start_date, end_date)
-    prev_topics_with_no_response = topics_with_no_response(previous_start_date, previous_end_date)
     period_emails_sent = emails_sent(start_date, end_date)
     prev_emails_sent = emails_sent(previous_start_date, previous_end_date)
     period_flags = flags(start_date, end_date)
