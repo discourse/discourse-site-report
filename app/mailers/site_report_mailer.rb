@@ -30,9 +30,11 @@ class SiteReportMailer < ActionMailer::Base
     period_visits = user_visits(start_date, end_date)
     prev_period_visits = user_visits(previous_start_date, previous_end_date)
     #mobile_visits = Report.find(:mobile_visits, start_date: start_date, end_date: end_date)
-    mobile_visits = user_visits_mobile(start_date, end_date)
+    period_mobile_visits = user_visits_mobile(start_date, end_date)
     prev_mobile_visits = user_visits_mobile(previous_start_date, previous_end_date)
-    signups = Report.find(:signups, start_date: start_date, end_date: end_date)
+    period_signups = signups(start_date, end_date)
+    prev_signups = signups(previous_start_date, previous_end_date)
+    # signups = Report.find(:signups, start_date: start_date, end_date: end_date)
     profile_views = Report.find(:profile_views, start_date: start_date, end_date: end_date)
     topics = Report.find(:topics, start_date: start_date, end_date: end_date)
     posts = Report.find(:posts, start_date: start_date, end_date: end_date)
@@ -77,8 +79,8 @@ class SiteReportMailer < ActionMailer::Base
       users_field_hash('all_users', all_users(end_date), all_users(previous_end_date), has_description: true),
       # field_hash('user_visits', total_from_data(visits.data), visits.prev30Days, has_description: true),
       users_field_hash('user_visits', period_visits, prev_period_visits, has_description: true),
-      users_field_hash('mobile_visits', mobile_visits, prev_mobile_visits, has_description: true),
-      users_field_hash('new_users', total_from_data(signups.data), signups.prev30Days, has_description: true),
+      users_field_hash('mobile_visits', period_mobile_visits, prev_mobile_visits, has_description: true),
+      users_field_hash('new_users', period_signups, prev_signups, has_description: true),
       users_field_hash('repeat_new_users', repeat_new_users_current, repeat_new_users_previous, has_description: true),
     ]
 
@@ -142,6 +144,10 @@ class SiteReportMailer < ActionMailer::Base
 
   def user_visits_mobile(start_date, end_date)
     UserVisit.where("visited_at >= :start_date AND visited_at <= :end_date AND mobile = true", start_date: start_date, end_date: end_date).count
+  end
+
+  def signups(start_date, end_date)
+    User.where("created_at >= :start_date AND created_at <= :end_date", start_date: start_date, end_date: end_date).count
   end
 
   def repeat_new_users(period_start, period_end, num_visits)
