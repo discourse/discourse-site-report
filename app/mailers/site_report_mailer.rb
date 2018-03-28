@@ -39,7 +39,9 @@ class SiteReportMailer < ActionMailer::Base
     # topics = Report.find(:topics, start_date: start_date, end_date: end_date)
     period_topics = topics_created(start_date, end_date)
     prev_topics = topics_created(previous_start_date, previous_end_date)
-    posts = Report.find(:posts, start_date: start_date, end_date: end_date)
+    # posts = Report.find(:posts, start_date: start_date, end_date: end_date)
+    period_posts = posts_created(start_date, end_date)
+    prev_posts = posts_created(previous_start_date, previous_end_date)
     time_to_first_response = Report.find(:time_to_first_response, start_date: start_date, end_date: end_date)
     topics_with_no_response = Report.find(:topics_with_no_response, start_date: start_date, end_date: end_date)
     emails = Report.find(:emails, start_date: start_date, end_date: end_date)
@@ -60,7 +62,7 @@ class SiteReportMailer < ActionMailer::Base
 
     header_metadata = [
       {key: 'site_report.active_users', value: active_users_current},
-      {key: 'site_report.posts', value: total_from_data(posts.data)},
+      {key: 'site_report.posts', value: period_posts},
       {key: 'site_report.posts_read', value: posts_read_current}
 
     ]
@@ -111,7 +113,7 @@ class SiteReportMailer < ActionMailer::Base
 
     content_fields = [
       content_field_hash('topics_created', period_topics, prev_topics, has_description: true),
-      content_field_hash('posts_created', total_from_data(posts.data), posts.prev30Days, has_description: true),
+      content_field_hash('posts_created', period_posts, prev_posts, has_description: true),
       content_field_hash('emails_sent', total_from_data(emails.data), emails.prev30Days, has_description: true),
     ]
 
@@ -154,6 +156,10 @@ class SiteReportMailer < ActionMailer::Base
 
   def topics_created(start_date, end_date)
     Topic.where("created_at >= :start_date AND created_at <= :end_date", start_date: start_date, end_date: end_date).count
+  end
+
+  def posts_created(start_date, end_date)
+    Post.where("created_at >= :start_date AND created_at <= :end_date", start_date: start_date, end_date: end_date).count
   end
 
   def repeat_new_users(period_start, period_end, num_visits)
