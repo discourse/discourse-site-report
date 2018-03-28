@@ -35,8 +35,10 @@ class SiteReportMailer < ActionMailer::Base
     period_signups = signups(start_date, end_date)
     prev_signups = signups(previous_start_date, previous_end_date)
     # signups = Report.find(:signups, start_date: start_date, end_date: end_date)
-    profile_views = Report.find(:profile_views, start_date: start_date, end_date: end_date)
-    topics = Report.find(:topics, start_date: start_date, end_date: end_date)
+    # profile_views = Report.find(:profile_views, start_date: start_date, end_date: end_date)
+    # topics = Report.find(:topics, start_date: start_date, end_date: end_date)
+    period_topics = topics_created(start_date, end_date)
+    prev_topics = topics_created(previous_start_date, previous_end_date)
     posts = Report.find(:posts, start_date: start_date, end_date: end_date)
     time_to_first_response = Report.find(:time_to_first_response, start_date: start_date, end_date: end_date)
     topics_with_no_response = Report.find(:topics_with_no_response, start_date: start_date, end_date: end_date)
@@ -108,7 +110,7 @@ class SiteReportMailer < ActionMailer::Base
     }
 
     content_fields = [
-      content_field_hash('topics_created', total_from_data(topics.data), topics.prev30Days, has_description: true),
+      content_field_hash('topics_created', period_topics, prev_topics, has_description: true),
       content_field_hash('posts_created', total_from_data(posts.data), posts.prev30Days, has_description: true),
       content_field_hash('emails_sent', total_from_data(emails.data), emails.prev30Days, has_description: true),
     ]
@@ -148,6 +150,10 @@ class SiteReportMailer < ActionMailer::Base
 
   def signups(start_date, end_date)
     User.where("created_at >= :start_date AND created_at <= :end_date", start_date: start_date, end_date: end_date).count
+  end
+
+  def topics_created(start_date, end_date)
+    Topic.where("created_at >= :start_date AND created_at <= :end_date", start_date: start_date, end_date: end_date).count
   end
 
   def repeat_new_users(period_start, period_end, num_visits)
