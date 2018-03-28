@@ -59,7 +59,9 @@ class SiteReportMailer < ActionMailer::Base
     #likes = Report.find(:likes, start_date: start_date, end_date: end_date)
     period_likes = likes(start_date, end_date)
     prev_likes = likes(previous_start_date, previous_end_date)
-    accepted_solutions = Report.find(:accepted_solutions, start_date: start_date, end_date: end_date)
+    #accepted_solutions = Report.find(:accepted_solutions, start_date: start_date, end_date: end_date)
+    period_accepted_solutions = accepted_solutions(start_date, end_date)
+    prev_accepted_solutions = accepted_solutions(previous_start_date, previous_end_date)
 
     active_users_current = active_users(start_date, end_date)
     active_users_previous = active_users(previous_start_date, previous_end_date)
@@ -113,8 +115,8 @@ class SiteReportMailer < ActionMailer::Base
       user_actions_field_hash('response_time', period_time_to_first_response, prev_time_to_first_response, has_description: true),
     ]
 
-    if accepted_solutions
-      user_action_fields << user_actions_field_hash('solutions', total_from_data(accepted_solutions.data), accepted_solutions.prev30Days, has_description: true)
+    if period_accepted_solutions > 0 || prev_accepted_solutions > 0
+      user_action_fields << user_actions_field_hash('solutions', period_accepted_solutions, prev_accepted_solutions, has_description: true)
     end
 
     user_action_data = {
@@ -198,6 +200,12 @@ class SiteReportMailer < ActionMailer::Base
                      start_date: start_date,
                      end_date: end_date,
                      like_type: PostActionType.types[:like]).count
+  end
+
+  def accepted_solutions(start_date, end_date)
+    TopicCustomField.where("name = 'accepted_answer_post_id' AND created_at >= :start_date AND created_at <= :end_date",
+                           start_date: start_date,
+                           end_date: end_date).count
   end
 
   def repeat_new_users(period_start, period_end, num_visits)
