@@ -45,7 +45,11 @@ class SiteReportMailer < ActionMailer::Base
     # time_to_first_response = Report.find(:time_to_first_response, start_date: start_date, end_date: end_date)
     period_time_to_first_response = time_to_first_response(start_date, end_date)
     prev_time_to_first_response = time_to_first_response(previous_start_date, previous_end_date)
-    topics_with_no_response = Report.find(:topics_with_no_response, start_date: start_date, end_date: end_date)
+    #topics_with_no_response = Report.find(:topics_with_no_response, start_date: start_date, end_date: end_date)
+
+    # Todo: this isn't being used.
+    period_topics_with_no_response = topics_with_no_response(start_date, end_date)
+    prev_topics_with_no_response = topics_with_no_response(previous_start_date, previous_end_date)
     emails = Report.find(:emails, start_date: start_date, end_date: end_date)
     flags = Report.find(:flags, start_date: start_date, end_date: end_date)
     likes = Report.find(:likes, start_date: start_date, end_date: end_date)
@@ -166,6 +170,10 @@ class SiteReportMailer < ActionMailer::Base
 
   def time_to_first_response(start_date, end_date)
     Topic.time_to_first_response_total(start_date: start_date, end_date: end_date)
+  end
+
+  def topics_with_no_response(start_date, end_date)
+    Topic.with_no_response_total(start_date: start_date, end_date: end_date)
   end
 
   def repeat_new_users(period_start, period_end, num_visits)
