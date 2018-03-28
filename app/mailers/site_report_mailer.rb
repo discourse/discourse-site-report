@@ -56,7 +56,9 @@ class SiteReportMailer < ActionMailer::Base
     # flags = Report.find(:flags, start_date: start_date, end_date: end_date)
     period_flags = flags(start_date, end_date)
     prev_flags = flags(previous_start_date, previous_end_date)
-    likes = Report.find(:likes, start_date: start_date, end_date: end_date)
+    #likes = Report.find(:likes, start_date: start_date, end_date: end_date)
+    period_likes = likes(start_date, end_date)
+    prev_likes = likes(previous_start_date, previous_end_date)
     accepted_solutions = Report.find(:accepted_solutions, start_date: start_date, end_date: end_date)
 
     active_users_current = active_users(start_date, end_date)
@@ -106,7 +108,7 @@ class SiteReportMailer < ActionMailer::Base
 
     user_action_fields = [
       user_actions_field_hash('posts_read', posts_read_current, posts_read_previous, has_description: true),
-      user_actions_field_hash('posts_liked', total_from_data(likes.data), likes.prev30Days, has_description: true),
+      user_actions_field_hash('posts_liked', period_likes, prev_likes, has_description: true),
       user_actions_field_hash('posts_flagged', period_flags, prev_flags, has_description: true),
       user_actions_field_hash('response_time', period_time_to_first_response, prev_time_to_first_response, has_description: true),
     ]
@@ -189,6 +191,13 @@ class SiteReportMailer < ActionMailer::Base
                      start_date: start_date,
                      end_date: end_date,
                      flag_actions: PostActionType.flag_types_without_custom.values).count
+  end
+
+  def likes(start_date, end_date)
+    PostAction.where("created_at >= :start_date AND created_at <= :end_date AND post_action_type_id = :like_type",
+                     start_date: start_date,
+                     end_date: end_date,
+                     like_type: PostActionType.types[:like]).count
   end
 
   def repeat_new_users(period_start, period_end, num_visits)
