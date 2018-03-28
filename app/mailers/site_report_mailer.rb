@@ -1,4 +1,3 @@
-require_dependency 'report'
 require_relative '../helpers/site_report_helper'
 
 class SiteReportMailer < ActionMailer::Base
@@ -26,40 +25,28 @@ class SiteReportMailer < ActionMailer::Base
     period_month = start_date.strftime('%B')
     days_in_period = end_date.day.to_i
 
-    # visits = Report.find(:visits, start_date: start_date, end_date: end_date)
     period_visits = user_visits(start_date, end_date)
     prev_period_visits = user_visits(previous_start_date, previous_end_date)
-    #mobile_visits = Report.find(:mobile_visits, start_date: start_date, end_date: end_date)
     period_mobile_visits = user_visits_mobile(start_date, end_date)
     prev_mobile_visits = user_visits_mobile(previous_start_date, previous_end_date)
     period_signups = signups(start_date, end_date)
     prev_signups = signups(previous_start_date, previous_end_date)
-    # signups = Report.find(:signups, start_date: start_date, end_date: end_date)
-    # profile_views = Report.find(:profile_views, start_date: start_date, end_date: end_date)
-    # topics = Report.find(:topics, start_date: start_date, end_date: end_date)
     period_topics = topics_created(start_date, end_date)
     prev_topics = topics_created(previous_start_date, previous_end_date)
-    # posts = Report.find(:posts, start_date: start_date, end_date: end_date)
     period_posts = posts_created(start_date, end_date)
     prev_posts = posts_created(previous_start_date, previous_end_date)
-    # time_to_first_response = Report.find(:time_to_first_response, start_date: start_date, end_date: end_date)
     period_time_to_first_response = time_to_first_response(start_date, end_date)
     prev_time_to_first_response = time_to_first_response(previous_start_date, previous_end_date)
-    #topics_with_no_response = Report.find(:topics_with_no_response, start_date: start_date, end_date: end_date)
 
     # Todo: this isn't being used.
     period_topics_with_no_response = topics_with_no_response(start_date, end_date)
     prev_topics_with_no_response = topics_with_no_response(previous_start_date, previous_end_date)
-    # emails = Report.find(:emails, start_date: start_date, end_date: end_date)
     period_emails_sent = emails_sent(start_date, end_date)
     prev_emails_sent = emails_sent(previous_start_date, previous_end_date)
-    # flags = Report.find(:flags, start_date: start_date, end_date: end_date)
     period_flags = flags(start_date, end_date)
     prev_flags = flags(previous_start_date, previous_end_date)
-    #likes = Report.find(:likes, start_date: start_date, end_date: end_date)
     period_likes = likes(start_date, end_date)
     prev_likes = likes(previous_start_date, previous_end_date)
-    #accepted_solutions = Report.find(:accepted_solutions, start_date: start_date, end_date: end_date)
     period_accepted_solutions = accepted_solutions(start_date, end_date)
     prev_accepted_solutions = accepted_solutions(previous_start_date, previous_end_date)
 
@@ -71,8 +58,6 @@ class SiteReportMailer < ActionMailer::Base
     repeat_new_users_previous = repeat_new_users previous_start_date, previous_end_date, 2
     posts_read_current = posts_read(start_date, end_date)
     posts_read_previous = posts_read(previous_start_date, previous_end_date)
-
-    # @data[:repeat_new_users] = create_data(repeat_new_users, previous_repeat_new_users)
 
     header_metadata = [
       {key: 'site_report.active_users', value: active_users_current},
@@ -95,7 +80,6 @@ class SiteReportMailer < ActionMailer::Base
 
     user_fields = [
       users_field_hash('all_users', all_users(end_date), all_users(previous_end_date), has_description: true),
-      # field_hash('user_visits', total_from_data(visits.data), visits.prev30Days, has_description: true),
       users_field_hash('user_visits', period_visits, prev_period_visits, has_description: true),
       users_field_hash('mobile_visits', period_mobile_visits, prev_mobile_visits, has_description: true),
       users_field_hash('new_users', period_signups, prev_signups, has_description: true),
@@ -319,24 +303,11 @@ class SiteReportMailer < ActionMailer::Base
     return 0 if current == previous
 
     (((current - previous) * 100.0) / previous).round(2)
-
-    # sprintf("%+d%", diff)
   end
 
   def format_compare(val)
     return I18n.t("site_report.no_data_available") if val.nil?
 
     sprintf("%+d%", val)
-  end
-
-  def total_from_data(data)
-    data.each.pluck(:y).sum
-  end
-
-  # todo: validate!
-  def average_from_data(data)
-    responses = data.count
-    total = data.each.pluck(:y).sum
-    (total / responses).round(2)
   end
 end
