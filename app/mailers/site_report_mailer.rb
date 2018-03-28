@@ -50,8 +50,12 @@ class SiteReportMailer < ActionMailer::Base
     # Todo: this isn't being used.
     period_topics_with_no_response = topics_with_no_response(start_date, end_date)
     prev_topics_with_no_response = topics_with_no_response(previous_start_date, previous_end_date)
-    emails = Report.find(:emails, start_date: start_date, end_date: end_date)
-    flags = Report.find(:flags, start_date: start_date, end_date: end_date)
+    # emails = Report.find(:emails, start_date: start_date, end_date: end_date)
+    period_emails_sent = emails_sent(start_date, end_date)
+    prev_emails_sent = emails_sent(previous_start_date, previous_end_date)
+    # flags = Report.find(:flags, start_date: start_date, end_date: end_date)
+    period_flags = flags(start_date, end_date)
+    prev_flags = flags(previous_start_date, previous_end_date)
     likes = Report.find(:likes, start_date: start_date, end_date: end_date)
     accepted_solutions = Report.find(:accepted_solutions, start_date: start_date, end_date: end_date)
 
@@ -103,7 +107,7 @@ class SiteReportMailer < ActionMailer::Base
     user_action_fields = [
       user_actions_field_hash('posts_read', posts_read_current, posts_read_previous, has_description: true),
       user_actions_field_hash('posts_liked', total_from_data(likes.data), likes.prev30Days, has_description: true),
-      user_actions_field_hash('posts_flagged', total_from_data(flags.data), flags.prev30Days, has_description: true),
+      user_actions_field_hash('posts_flagged', period_flags, prev_flags, has_description: true),
       user_actions_field_hash('response_time', period_time_to_first_response, prev_time_to_first_response, has_description: true),
     ]
 
@@ -120,7 +124,7 @@ class SiteReportMailer < ActionMailer::Base
     content_fields = [
       content_field_hash('topics_created', period_topics, prev_topics, has_description: true),
       content_field_hash('posts_created', period_posts, prev_posts, has_description: true),
-      content_field_hash('emails_sent', total_from_data(emails.data), emails.prev30Days, has_description: true),
+      content_field_hash('emails_sent', period_emails_sent, prev_emails_sent, has_description: true),
     ]
 
     content_data = {
@@ -174,6 +178,17 @@ class SiteReportMailer < ActionMailer::Base
 
   def topics_with_no_response(start_date, end_date)
     Topic.with_no_response_total(start_date: start_date, end_date: end_date)
+  end
+
+  def emails_sent(start_date, end_date)
+    EmailLog.where("created_at >= :start_date AND created_at <= :end_date", start_date: start_date, end_date: end_date).count
+  end
+
+  def flags(start_date, end_date)
+    PostAction.where("created_at >= :start_date AND created_at <= :end_date AND post_action_type_id IN (:flag_actions)",
+                     start_date: start_date,
+                     end_date: end_date,
+                     flag_actions: PostActionType.flag_types_without_custom.values).count
   end
 
   def repeat_new_users(period_start, period_end, num_visits)
