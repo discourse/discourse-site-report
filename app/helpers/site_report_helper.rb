@@ -1,6 +1,8 @@
 module SiteReportHelper
+  def rtl?
+    ["ar", "ur", "fa_IR", "he"].include? I18n.locale.to_s
+  end
 
-  # todo: the rtl? method needs to be included from ApplicationHelper
   def dir_for_locale
     rtl? ? 'rtl' : 'ltr'
   end
