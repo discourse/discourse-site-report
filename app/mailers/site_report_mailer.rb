@@ -9,10 +9,11 @@ class SiteReportMailer < ActionMailer::Base
   @@hide_user_actions_section = true
 
   include Rails.application.routes.url_helpers
-  include ApplicationHelper
+  # include ApplicationHelper
   include SiteReportHelper
-  helper :application
+  # helper :application
   add_template_helper SiteReportHelper
+  append_view_path Rails.root.join('plugins', 'discourse-site-report', 'app', 'views')
   default from: SiteSetting.notification_email
 
   def report
