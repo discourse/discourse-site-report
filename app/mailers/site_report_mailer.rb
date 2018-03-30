@@ -1,12 +1,7 @@
 require_relative '../helpers/site_report_helper'
 
 class SiteReportMailer < ActionMailer::Base
-  attr_accessor :hide_count, :hide_health_section, :hide_users_section, :hide_content_section, :hide_user_actions_section
-  @@hide_count = 0
-  @@hide_health_section = true
-  @@hide_users_section = true
-  @@hide_content_section = true
-  @@hide_user_actions_section = true
+  attr_accessor :hide_count, :poor_health, :compare_threshold
 
   include Rails.application.routes.url_helpers
   include SiteReportHelper
@@ -63,58 +58,58 @@ class SiteReportMailer < ActionMailer::Base
     ]
 
     health_fields = [
-      health_field_hash('active_users', period_active_users, prev_active_users, has_description: true),
-      health_field_hash( 'daily_active_users', period_dau, prev_dau, has_description: true),
-      health_field_hash('health', health(period_dau, period_active_users), health(prev_dau, prev_active_users), has_description: true)
+      field_hash('active_users', period_active_users, prev_active_users, has_description: true),
+      field_hash( 'daily_active_users', period_dau, prev_dau, has_description: true),
+      field_hash('health', health(period_dau, period_active_users), health(prev_dau, prev_active_users), has_description: true)
     ]
 
-    # Todo: if the health section is hidden, don't send the report.
+    @poor_health = health_fields.any? ? false : true
     health_data =  {
       title_key: 'site_report.health_section_title',
-      hide_section: @@hide_health_section,
+      # hide_section: health_fields.any? ? false : true,
       fields: health_fields
     }
 
     user_fields = [
-      users_field_hash('all_users', all_users(end_date), all_users(previous_end_date), has_description: true),
-      users_field_hash('user_visits', period_visits, prev_period_visits, has_description: true),
-      users_field_hash('mobile_visits', period_mobile_visits, prev_mobile_visits, has_description: true),
-      users_field_hash('new_users', period_signups, prev_signups, has_description: true),
-      users_field_hash('repeat_new_users', period_repeat_new_users, prev_repeat_new_users, has_description: true),
+      field_hash('all_users', all_users(end_date), all_users(previous_end_date), has_description: true),
+      field_hash('user_visits', period_visits, prev_period_visits, has_description: true),
+      field_hash('mobile_visits', period_mobile_visits, prev_mobile_visits, has_description: true),
+      field_hash('new_users', period_signups, prev_signups, has_description: true),
+      field_hash('repeat_new_users', period_repeat_new_users, prev_repeat_new_users, has_description: true),
     ]
 
     user_data = {
       title_key: 'site_report.users_section_title',
-      hide_section: @@hide_users_section,
+      hide_section: user_fields.any? ? false : true,
       fields: user_fields
     }
 
     user_action_fields = [
-      user_actions_field_hash('posts_read', period_posts_read, prev_posts_read, has_description: false),
-      user_actions_field_hash('posts_liked', period_likes, prev_likes, has_description: false),
-      user_actions_field_hash('posts_flagged', period_flags, prev_flags, has_description: false),
-      user_actions_field_hash('response_time', period_time_to_first_response, prev_time_to_first_response, has_description: true),
+      field_hash('posts_read', period_posts_read, prev_posts_read, has_description: false),
+      field_hash('posts_liked', period_likes, prev_likes, has_description: false),
+      field_hash('posts_flagged', period_flags, prev_flags, has_description: false),
+      field_hash('response_time', period_time_to_first_response, prev_time_to_first_response, has_description: true),
     ]
 
     if period_accepted_solutions > 0 || prev_accepted_solutions > 0
-      user_action_fields << user_actions_field_hash('solutions', period_accepted_solutions, prev_accepted_solutions, has_description: true)
+      user_action_fields << field_hash('solutions', period_accepted_solutions, prev_accepted_solutions, has_description: true)
     end
 
     user_action_data = {
       title_key: 'site_report.user_actions_title',
-      hide_section: @@hide_user_actions_section,
+      hide_section: user_action_fields.any? ? false : true,
       fields: user_action_fields
     }
 
     content_fields = [
-      content_field_hash('topics_created', period_topics, prev_topics, has_description: false),
-      content_field_hash('posts_created', period_posts, prev_posts, has_description: false),
-      content_field_hash('emails_sent', period_emails_sent, prev_emails_sent, has_description: false),
+      field_hash('topics_created', period_topics, prev_topics, has_description: false),
+      field_hash('posts_created', period_posts, prev_posts, has_description: false),
+      field_hash('emails_sent', period_emails_sent, prev_emails_sent, has_description: false),
     ]
 
     content_data = {
       title_key: 'site_report.content_section_title',
-      hide_section: @@hide_content_section,
+      hide_section: content_fields.any? ? false : true,
       fields: content_fields
     }
 
@@ -133,8 +128,53 @@ class SiteReportMailer < ActionMailer::Base
       data_array: data_array
     }
 
-    admin_emails = User.where(admin: true).map(&:email).select {|e| e.include?('@')}
-    mail(to: admin_emails, subject: subject)
+    if send_report
+      admin_emails = User.where(admin: true).map(&:email).select {|e| e.include?('@')}
+      mail(to: admin_emails, subject: subject)
+    end
+  end
+
+  private
+
+  def initialize
+    super
+    @hide_count = 0
+    @compare_threshold = -10
+  end
+
+
+  def send_report
+    true unless @poor_health || @hide_count > 5
+  end
+
+  def field_hash(key, current, previous, opts = {})
+    compare_value = compare(current, previous)
+    hide = opts[:negative_compare] ? compare_value && compare_value > -@compare_threshold : compare_value && compare_value < @compare_threshold
+    if hide
+      @hide_count += 1
+      nil
+    else
+      {
+        key: "site_report.#{key}",
+        value: current,
+        compare: format_compare(compare_value),
+        description_key: opts[:has_description] ? "site_report.descriptions.#{key}" : nil,
+        hide: hide
+      }
+    end
+  end
+
+  def compare(current, previous)
+    return nil if previous == 0
+    return 0 if current == previous
+
+    (((current - previous) * 100.0) / previous).round(2)
+  end
+
+  def format_compare(val)
+    return I18n.t("site_report.no_data_available") if val.nil?
+
+    sprintf("%+d%", val)
   end
 
   # Health
@@ -254,68 +294,5 @@ class SiteReportMailer < ActionMailer::Base
     TopicCustomField.where("name = 'accepted_answer_post_id' AND created_at >= :start_date AND created_at <= :end_date",
                            start_date: start_date,
                            end_date: end_date).count
-  end
-
-  # Utilities
-
-  def health_field_hash(key, current, previous, opts = {})
-    field = field_hash(key, current, previous, opts)
-
-    @@hide_health_section = false unless field[:hide]
-
-    field
-  end
-
-  def users_field_hash(key, current, previous, opts = {})
-    field = field_hash(key, current, previous, opts)
-
-    @@hide_users_section = false unless field[:hide]
-
-    field
-  end
-
-  def user_actions_field_hash(key, current, previous, opts = {})
-    field = field_hash(key, current, previous, opts)
-
-    @@hide_user_actions_section = false unless field[:hide]
-
-    field
-  end
-
-  def content_field_hash(key, current, previous, opts = {})
-    field = field_hash(key, current, previous, opts)
-
-    @@hide_content_section = false unless field[:hide]
-
-    field
-  end
-
-  def field_hash(key, current, previous, opts = {})
-    compare_value = compare(current, previous)
-    # todo: set this to a sane value
-    hide = opts[:negative_compare] ? compare_value && compare_value > 10.0 : compare_value && compare_value < -1000.0
-    @@hide_count += 1 if hide
-
-    {
-      key: "site_report.#{key}",
-      value: current,
-      compare: format_compare(compare_value),
-      description_key: opts[:has_description] ? "site_report.descriptions.#{key}" : nil,
-      hide: hide
-    }
-  end
-
-  def compare(current, previous)
-    # return I18n.t("site_report.no_data_available") if previous == 0
-    return nil if previous == 0
-    return 0 if current == previous
-
-    (((current - previous) * 100.0) / previous).round(2)
-  end
-
-  def format_compare(val)
-    return I18n.t("site_report.no_data_available") if val.nil?
-
-    sprintf("%+d%", val)
   end
 end
