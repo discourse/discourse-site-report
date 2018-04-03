@@ -1,0 +1,7 @@
+en:
+  js:
+    site_report:
+      title: "Site Report"
+      preview:
+        send_report: "Send a preview of the email for the current month."
+        send: "Send"
