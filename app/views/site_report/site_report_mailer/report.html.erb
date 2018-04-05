@@ -96,16 +96,11 @@
               <td style="background-color:<%= body_bgcolor -%>; color:<%= body_color -%>;font-size:22px;font-weight:400;font-family:Helvetica,Arial,sans-serif !important;">
                 <table dir="<%= dir_for_locale %>" border="0" cellpadding="0" cellspacing="0" width="100%" style="font-size:2px;font-weight:400;font-family:Helvetica,Arial,sans-serif !important;border-collapse:collapse;">
                   <tr>
-                    <!--<td class="highlight-side-spacer" width="5%" style="background-color:<%= spacer_color outer_count -%>;">-->
                     <%= raw(highlight_side_spacer outer_count) -%>
-                      &nbsp;
-                    </td>
                     <td style="padding: 20px 0 5px 0; background-color:<%= body_bgcolor -%>; color:<%= body_color -%>;font-size:22px;font-weight:400;font-family:Helvetica,Arial,sans-serif !important;text-align: center">
                       <strong><%= t obj[:title_key] -%></strong>
                     </td>
-                    <td class="highlight-side-spacer" width="5%" style="background-color:<%= spacer_color outer_count -%>;">
-                      &nbsp;
-                    </td>
+                    <%= raw(highlight_side_spacer outer_count) -%>
                   </tr>
                 </table>
               </td>
@@ -119,7 +114,7 @@
                   <td style="background-color:<%= body_bgcolor -%>; color:<%= body_color -%>;font-size:18px;font-weight:400;font-family:Helvetica,Arial,sans-serif !important;">
                     <table dir="<%= dir_for_locale %>" border="0" cellpadding="0" cellspacing="0" width="100%" style="font-size:14px;font-weight:400;font-family:Helvetica,Arial,sans-serif !important;border-collapse:collapse;">
                       <tr>
-                        <td class="highlight-side-spacer" width="5%" style="background-color:<%= spacer_color(outer_count, inner_count) -%>;">&nbsp;</td>
+                        <%= raw(side_spacer) -%>
                         <td>
                           <table dir="<%= dir_for_locale %>" border="0" cellpadding="0" cellspacing="0" width="66%" align="center" style="margin:0 auto;border-collapse:collapse;">
                             <tr>
@@ -140,7 +135,7 @@
                           </table>
 
                         </td>
-                        <td class="highlight-side-spacer" width="5%" style="background-color:<%= spacer_color(outer_count, inner_count) -%>;">&nbsp;</td>
+                        <%= raw(side_spacer) -%>
                       </tr>
                     </table>
                   </td>
@@ -156,7 +151,7 @@
                   <td style="background-color:<%= body_bgcolor -%>; color:<%= body_color -%>;font-size:14px;font-weight:400;font-family:Helvetica,Arial,sans-serif !important;">
                     <table dir="<%= dir_for_locale %>" border="0" cellpadding="0" cellspacing="0" width="100%" style="font-size:14px;font-weight:400;font-family:Helvetica,Arial,sans-serif !important;border-collapse:collapse;">
                       <tr>
-                        <td class="highlight-side-spacer" width="5%" style="background-color:<%= bg_color -%>;">&nbsp;</td>
+                        <%= raw(side_spacer) -%>
                         <td>
                           <table dir="<%= dir_for_locale %>" border="0" cellpadding="0" cellspacing="0" width="66%" align="center" style="font-size:14px;font-weight:400;font-family:Helvetica,Arial,sans-serif !important;margin:0 auto;border-collapse:collapse;">
                             <tr>
@@ -167,7 +162,7 @@
                             </tr>
                           </table>
                         </td>
-                        <td class="highlight-side-spacer" width="5%" style="background-color:<%= bg_color -%>;">&nbsp;</td>
+                        <%= raw(side_spacer) -%>
                       </tr>
                     </table>
                   </td>
@@ -181,9 +176,9 @@
               <td style="background-color:<%= body_bgcolor -%>;font-size:15px;line-height:15px;">
                 <table dir="<%= dir_for_locale %>" border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse:collapse;">
                   <tr>
-                    <td class="highlight-side-spacer" width="5%" style="background-color:<%= bg_color -%>;font-size:20px;line-height:20px;">&nbsp;</td>
+                    <%= raw(side_spacer) -%>
                     <td style="background-color:<%= body_bgcolor -%>;font-size:20px;line-height:20px;" width="90%">&nbsp;</td>
-                    <td class="highlight-side-spacer" width="5%" style="background-color:<%= bg_color -%>;font-size:20px;line-height:20px;">&nbsp;</td>
+                    <%= raw(side_spacer) -%>
                   </tr>
                 </table>
               </td>
@@ -203,15 +198,11 @@
             <td style="background-color:<%= body_bgcolor -%>; color:<%= body_color -%>;font-size:22px;font-weight:400;font-family:Helvetica,Arial,sans-serif !important;">
               <table dir="<%= dir_for_locale %>" border="0" cellpadding="0" cellspacing="0" width="100%" style="font-size:2px;font-weight:400;font-family:Helvetica,Arial,sans-serif !important;border-collapse:collapse;">
                 <tr>
-                  <td class="highlight-side-spacer" width="5%" style="background-color:<%= highlight_bgcolor -%>;">
-                    &nbsp;
-                  </td>
+                  <%= raw(highlight_side_spacer 0) -%>
                   <td style="padding: 20px 0 5px 0; background-color:<%= body_bgcolor -%>; color:<%= body_color -%>;font-size:22px;font-weight:400;font-family:Helvetica,Arial,sans-serif !important;text-align: center">
                     <strong><%= t 'site_report.tips_report_heading' -%></strong>
                   </td>
-                  <td class="highlight-side-spacer" width="5%" style="background-color:<%= highlight_bgcolor -%>;">
-                    &nbsp;
-                  </td>
+                  <%= raw(highlight_side_spacer 0) -%>
                 </tr>
               </table>
             </td>
@@ -222,9 +213,7 @@
             <td style="background-color:<%= body_bgcolor -%>; color:<%= body_color -%>;font-size:22px;font-weight:400;font-family:Helvetica,Arial,sans-serif !important;">
               <table dir="<%= dir_for_locale %>" border="0" cellpadding="0" cellspacing="0" width="100%" style="font-size:2px;font-weight:400;font-family:Helvetica,Arial,sans-serif !important;border-collapse:collapse;">
                 <tr>
-                  <td class="highlight-side-spacer" width="5%" style="background-color:<%= bg_color -%>;">
-                    &nbsp;
-                  </td>
+                  <%= raw(side_spacer) -%>
                   <td class="body-side-spacer" width="5%" style="background-color:<%= body_bgcolor -%>;">
                     &nbsp;
                   </td>
@@ -238,14 +227,10 @@
                   <td class="body-side-spacer" width="5%" style="background-color:<%= body_bgcolor -%>;">
                     &nbsp;
                   </td>
-                  <td class="highlight-side-spacer" width="5%" style="background-color:<%= bg_color -%>;">
-                    &nbsp;
-                  </td>
+                  <%= raw(side_spacer) -%>
                 </tr>
                 <tr>
-                  <td class="highlight-side-spacer" width="5%" style="background-color:<%= bg_color -%>;">
-                    &nbsp;
-                  </td>
+                  <%= raw(side_spacer) -%>
                   <td class="body-side-spacer" width="5%" style="background-color:<%= body_bgcolor -%>;">
                     &nbsp;
                   </td>
@@ -273,9 +258,7 @@
                   <td class="body-side-spacer" width="5%" style="background-color:<%= body_bgcolor -%>;">
                     &nbsp;
                   </td>
-                  <td class="highlight-side-spacer" width="5%" style="background-color:<%= bg_color -%>;">
-                    &nbsp;
-                  </td>
+                  <%= raw(side_spacer) -%>
                 </tr>
 
               </table>
