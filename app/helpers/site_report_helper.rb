@@ -63,8 +63,9 @@ module SiteReportHelper
     months_ago.month.ago.strftime('%B %Y')
   end
 
-  def site_report_title(months_ago = 1)
-    "#{I18n.t('site_report.title')} #{report_date(months_ago)}"
+  def site_report_title(months_ago, report_type)
+    key = "site_report.#{report_type}_title"
+    "#{I18n.t(key)} #{report_date(months_ago)}"
   end
 
   def spacer_color(outer_count, inner_count = 0)

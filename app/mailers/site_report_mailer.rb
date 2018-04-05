@@ -10,7 +10,7 @@ class SiteReport::SiteReportMailer < ActionMailer::Base
   default from: SiteSetting.notification_email
 
   def report(send_to: nil)
-    subject = site_report_title
+
     start_date = 1.month.ago.beginning_of_month
     end_date = 1.month.ago.end_of_month
     previous_start_date = 2.months.ago.beginning_of_month
@@ -119,6 +119,9 @@ class SiteReport::SiteReportMailer < ActionMailer::Base
       user_action_data,
       content_data,
     ]
+
+    # todo: set months_ago as an argument to report method
+    subject = site_report_title(1, report_type)
 
     @data = {
       period_month: period_month,
