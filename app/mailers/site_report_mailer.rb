@@ -9,7 +9,7 @@ class SiteReport::SiteReportMailer < ActionMailer::Base
   append_view_path Rails.root.join('plugins', 'discourse-site-report', 'app', 'views')
   default from: SiteSetting.notification_email
 
-  def report
+  def report(send_to: nil)
     subject = site_report_title
     start_date = 1.month.ago.beginning_of_month
     end_date = 1.month.ago.end_of_month
@@ -128,18 +128,11 @@ class SiteReport::SiteReportMailer < ActionMailer::Base
       data_array: data_array
     }
 
-    # if send_report
-      # if send_to
-      #   mail(to: send_to, subject: subject)
-      # else
-      #   admin_emails = User.where(admin: true).map(&:email).select {|e| e.include?('@')}
-      #   mail(to: admin_emails, subject: subject)
-      # end
-
-    # end
-
-    admin_emails = User.where(admin: true).map(&:email).select { |e| e.include?('@') }
-    mail(to: admin_emails, subject: subject)
+    if send_report
+      admin_emails = User.where(admin: true).map(&:email).select { |e| e.include?('@') }
+      mail_to = send_to ? send_to : admin_emails
+      mail(to: mail_to, subject: subject)
+    end
   end
 
   private

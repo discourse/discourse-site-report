@@ -29,9 +29,8 @@ after_initialize do
     end
 
     def preview
-      # puts "THIS IS A TEST FROM THE PREVIEW FUNCTION #{current_user.email}"
-      # email = current_user.email
-      SiteReport::SiteReportMailer.report.deliver_now
+      email = current_user.email
+      SiteReport::SiteReportMailer.report(send_to: email).deliver_now
 
       render json: { success: true }
     end

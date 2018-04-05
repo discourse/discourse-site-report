@@ -4,7 +4,7 @@ module ::Jobs
     sidekiq_options 'retry' => true, 'queue' => 'critical'
 
     def execute(args)
-      ::SiteReport::SiteReportMailer.report.deliver_now
+      ::SiteReport::SiteReportMailer.report(args).deliver_now
     end
   end
 end
