@@ -7,6 +7,10 @@ module SiteReportHelper
     rtl? ? 'rtl' : 'ltr'
   end
 
+  def direction_for_locale
+    rtl? ? 'right' : 'left'
+  end
+
   def logo_url
     logo_url = SiteSetting.digest_logo_url
     logo_url = SiteSetting.logo_url if logo_url.blank? || logo_url =~ /\.svg$/i
