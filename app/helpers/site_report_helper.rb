@@ -60,7 +60,7 @@ module SiteReportHelper
   end
 
   def site_report_title(months_ago = 1)
-    "#{I18n.t('statistics_digest.title')} #{report_date(months_ago)}"
+    "#{I18n.t('site_report.title')} #{report_date(months_ago)}"
   end
 
   def spacer_color(outer_count, inner_count = 0)
