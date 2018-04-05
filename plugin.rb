@@ -19,8 +19,8 @@ after_initialize do
   end
 
   [
-    '../app/mailers/site_report_mailer.rb',
-    '../app/jobs/send_site_report.rb'
+    '../../discourse-site-report/app/mailers/site_report_mailer.rb',
+    '../../discourse-site-report/app/jobs/site_report.rb'
   ].each { |path| load File.expand_path(path, __FILE__) }
 
   require_dependency 'application_controller'
@@ -29,6 +29,8 @@ after_initialize do
     end
 
     def preview
+      # puts "THIS IS A TEST FROM THE PREVIEW FUNCTION #{current_user.email}"
+      # email = current_user.email
       SiteReport::SiteReportMailer.report.deliver_now
 
       render json: { success: true }

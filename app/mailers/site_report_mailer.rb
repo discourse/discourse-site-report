@@ -1,6 +1,6 @@
 require_relative '../helpers/site_report_helper'
 
-class SiteReportMailer < ActionMailer::Base
+class SiteReport::SiteReportMailer < ActionMailer::Base
   attr_accessor :hide_count, :poor_health, :compare_threshold
 
   include Rails.application.routes.url_helpers
@@ -128,10 +128,18 @@ class SiteReportMailer < ActionMailer::Base
       data_array: data_array
     }
 
-    if send_report
-      admin_emails = User.where(admin: true).map(&:email).select {|e| e.include?('@')}
-      mail(to: admin_emails, subject: subject)
-    end
+    # if send_report
+      # if send_to
+      #   mail(to: send_to, subject: subject)
+      # else
+      #   admin_emails = User.where(admin: true).map(&:email).select {|e| e.include?('@')}
+      #   mail(to: admin_emails, subject: subject)
+      # end
+
+    # end
+
+    admin_emails = User.where(admin: true).map(&:email).select { |e| e.include?('@') }
+    mail(to: admin_emails, subject: subject)
   end
 
   private

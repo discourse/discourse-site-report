@@ -5,3 +5,4 @@ en:
       preview:
         send_report: "Send a preview of the email for the current month."
         send: "Send"
+        sent: "The email has been sent"

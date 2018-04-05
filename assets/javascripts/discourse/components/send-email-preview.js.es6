@@ -7,7 +7,9 @@ export default Ember.Component.extend({
 
   actions: {
     submit() {
-      ajax('/admin/plugins/site-report/preview.json').catch(popupAjaxError);
+      ajax('/admin/plugins/site-report/preview.json').then(() => {
+        bootbox.alert(I18n.t("site_report.preview.sent"));
+      }).catch(popupAjaxError);
     }
   }
 });
