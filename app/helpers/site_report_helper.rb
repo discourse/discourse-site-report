@@ -78,7 +78,7 @@ module SiteReportHelper
   end
 
   def site_report_link(color)
-    "<a style='text-decoration:none;color:#{color}' href='#{Discourse.base_url}/admin/plugins/site-report' style='color: #{color}'>#{t 'statistics_digest.here'}</a>"
+    "<a style='text-decoration:none;color:#{color}' href='#{Discourse.base_url}/admin/plugins/site-report' style='color: #{color}'>#{t 'site_report.here'}</a>"
   end
 
   def superscript(count)
