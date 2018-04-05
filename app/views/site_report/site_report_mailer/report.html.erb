@@ -96,7 +96,8 @@
               <td style="background-color:<%= body_bgcolor -%>; color:<%= body_color -%>;font-size:22px;font-weight:400;font-family:Helvetica,Arial,sans-serif !important;">
                 <table dir="<%= dir_for_locale %>" border="0" cellpadding="0" cellspacing="0" width="100%" style="font-size:2px;font-weight:400;font-family:Helvetica,Arial,sans-serif !important;border-collapse:collapse;">
                   <tr>
-                    <td class="highlight-side-spacer" width="5%" style="background-color:<%= spacer_color outer_count -%>;">
+                    <!--<td class="highlight-side-spacer" width="5%" style="background-color:<%= spacer_color outer_count -%>;">-->
+                    <%= raw(highlight_side_spacer outer_count) -%>
                       &nbsp;
                     </td>
                     <td style="padding: 20px 0 5px 0; background-color:<%= body_bgcolor -%>; color:<%= body_color -%>;font-size:22px;font-weight:400;font-family:Helvetica,Arial,sans-serif !important;text-align: center">

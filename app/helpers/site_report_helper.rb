@@ -98,4 +98,8 @@ module SiteReportHelper
     "<img src='#{image_url(filename)}' width='#{width}' alt='#{alt}'>"
   end
 
+  def highlight_side_spacer(row_count)
+    "<td class='highlight-side-spacer' width='5%' style='background-color: #{spacer_color row_count};'>"
+  end
+
 end
