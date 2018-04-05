@@ -77,12 +77,20 @@ module SiteReportHelper
     "<a style='text-decoration:none;color:#{color}' href='#{Discourse.base_url}' style='color: #{color}'>#{SiteSetting.title}</a>"
   end
 
-  def statistics_digest_link(color)
-    "<a style='text-decoration:none;color:#{color}' href='#{Discourse.base_url}/admin/plugins/admin-statistics-digest' style='color: #{color}'>#{t 'statistics_digest.here'}</a>"
+  def site_report_link(color)
+    "<a style='text-decoration:none;color:#{color}' href='#{Discourse.base_url}/admin/plugins/site-report' style='color: #{color}'>#{t 'statistics_digest.here'}</a>"
   end
 
   def superscript(count)
     "<sup style='line-height:0;font-size:70%;vertical-align:top;mso-text-raise:50%'>[#{count}]</sup>"
+  end
+
+  def image_url(filename)
+    "#{Discourse.base_url}/plugins/discourse-site-report/images/#{filename}"
+  end
+
+  def image_tag(filename, width: 300, alt: nil)
+    "<img src='#{image_url(filename)}' width='#{width}' alt='#{alt}'>"
   end
 
 end

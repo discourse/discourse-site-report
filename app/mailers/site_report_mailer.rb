@@ -125,14 +125,19 @@ class SiteReport::SiteReportMailer < ActionMailer::Base
       title: subject,
       subject: subject,
       header_metadata: header_metadata,
-      data_array: data_array
+      data_array: data_array,
+      report_type: report_type
     }
 
-    if send_report
-      admin_emails = User.where(admin: true).map(&:email).select { |e| e.include?('@') }
-      mail_to = send_to ? send_to : admin_emails
-      mail(to: mail_to, subject: subject)
-    end
+    admin_emails = User.where(admin: true).map(&:email).select { |e| e.include?('@') }
+    mail_to = send_to ? send_to : admin_emails
+    mail(to: mail_to, subject: subject)
+
+    # if send_report
+    #   admin_emails = User.where(admin: true).map(&:email).select { |e| e.include?('@') }
+    #   mail_to = send_to ? send_to : admin_emails
+    #   mail(to: mail_to, subject: subject)
+    # end
   end
 
   private
@@ -141,11 +146,19 @@ class SiteReport::SiteReportMailer < ActionMailer::Base
     super
     @hide_count = 0
     @compare_threshold = -10
+    @alternate_report = false
   end
-
 
   def send_report
     true unless @poor_health || @hide_count > 5
+    @alternate_report = @poor_health || @hide_count > 5 ? true : false
+
+    # todo: remove this!
+    true
+  end
+
+  def report_type
+    @poor_health || @hide_count > 5 ? :tips : :stats
   end
 
   def field_hash(key, current, previous, opts = {})

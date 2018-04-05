@@ -2,6 +2,9 @@ en:
   site_settings:
     site_report_enabled: "Enable the site report."
   site_report:
+    unsubscribe: "This summary was sent from %{site_link}. To stop receiving theses emails, change your settings %{email_preferences_link}."
+    here: "here"
+    visit_link: "Visit this link"
     title: "Key Statistics for"
     health_section_title: "Health"
     users_section_title: "Users"
@@ -25,6 +28,7 @@ en:
     posts_created: "Posts Created"
     emails_sent: "Emails Sent"
     no_data_available: "No Data Available"
+    tips_report_heading: "Building Your Community"
     descriptions:
       all_users: "Total number of users on your forum."
       new_users: "Users who have signed up over the past month."
