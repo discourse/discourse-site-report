@@ -62,7 +62,7 @@ class SiteReport::SiteReportMailer < ActionMailer::Base
       field_hash('active_users', period_active_users, prev_active_users, has_description: true),
       field_hash( 'daily_active_users', period_dau, prev_dau, has_description: true),
       field_hash('health', health(period_dau, period_active_users), health(prev_dau, prev_active_users), has_description: true)
-    ]
+    ].compact
 
     @poor_health = health_fields.any? ? false : true
     health_data =  {
@@ -76,7 +76,7 @@ class SiteReport::SiteReportMailer < ActionMailer::Base
       field_hash('mobile_visits', period_mobile_visits, prev_mobile_visits, has_description: true),
       field_hash('new_users', period_signups, prev_signups, has_description: true),
       field_hash('repeat_new_users', period_repeat_new_users, prev_repeat_new_users, has_description: true),
-    ]
+    ].compact
 
     user_data = {
       title_key: 'site_report.users_section_title',
@@ -89,7 +89,7 @@ class SiteReport::SiteReportMailer < ActionMailer::Base
       field_hash('posts_liked', period_likes, prev_likes, has_description: false),
       field_hash('posts_flagged', period_flags, prev_flags, has_description: false),
       field_hash('response_time', period_time_to_first_response, prev_time_to_first_response, has_description: true),
-    ]
+    ].compact
 
     if period_accepted_solutions > 0 || prev_accepted_solutions > 0
       user_action_fields << field_hash('solutions', period_accepted_solutions, prev_accepted_solutions, has_description: true)
@@ -105,7 +105,7 @@ class SiteReport::SiteReportMailer < ActionMailer::Base
       field_hash('topics_created', period_topics, prev_topics, has_description: false),
       field_hash('posts_created', period_posts, prev_posts, has_description: false),
       field_hash('emails_sent', period_emails_sent, prev_emails_sent, has_description: false),
-    ]
+    ].compact
 
     content_data = {
       title_key: 'site_report.content_section_title',
@@ -128,7 +128,7 @@ class SiteReport::SiteReportMailer < ActionMailer::Base
       subject: subject,
       header_metadata: header_metadata,
       data_array: data_array,
-      report_type: report_type
+      report_type: :stats
     }
 
     admin_emails = User.where(admin: true).map(&:email).select { |e| e.include?('@') }
