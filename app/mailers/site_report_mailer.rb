@@ -66,7 +66,6 @@ class SiteReport::SiteReportMailer < ActionMailer::Base
     @poor_health = health_fields.any? ? false : true
     health_data =  {
       title_key: 'site_report.health_section_title',
-      # hide_section: health_fields.any? ? false : true,
       fields: health_fields
     }
 
@@ -129,18 +128,12 @@ class SiteReport::SiteReportMailer < ActionMailer::Base
       subject: subject,
       header_metadata: header_metadata,
       data_array: data_array,
-      report_type: report_type
+      report_type: :stats
     }
 
     admin_emails = User.where(admin: true).map(&:email).select { |e| e.include?('@') }
     mail_to = send_to ? send_to : admin_emails
     mail(to: mail_to, subject: subject)
-
-    # if send_report
-    #   admin_emails = User.where(admin: true).map(&:email).select { |e| e.include?('@') }
-    #   mail_to = send_to ? send_to : admin_emails
-    #   mail(to: mail_to, subject: subject)
-    # end
   end
 
   private
@@ -150,14 +143,6 @@ class SiteReport::SiteReportMailer < ActionMailer::Base
     @hide_count = 0
     @compare_threshold = -10
     @alternate_report = false
-  end
-
-  def send_report
-    true unless @poor_health || @hide_count > 5
-    @alternate_report = @poor_health || @hide_count > 5 ? true : false
-
-    # todo: remove this!
-    true
   end
 
   def report_type
