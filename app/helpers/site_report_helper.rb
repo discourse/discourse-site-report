@@ -94,7 +94,7 @@ module SiteReportHelper
     "#{Discourse.base_url}/plugins/discourse-site-report/images/#{filename}"
   end
 
-  def image_tag(filename, width: 300, alt: nil)
+  def report_image_tag(filename, width: 300, alt: nil)
     "<img src='#{image_url(filename)}' width='#{width}' alt='#{alt}'>"
   end
 
@@ -104,6 +104,10 @@ module SiteReportHelper
 
   def side_spacer
     "<td class='side-spacer' width='5%' style='background-color: #{bg_color};'>&nbsp;</td>"
+  end
+
+  def body_side_spacer
+    "<td class='side-spacer' width='5%' style='background-color: #{body_bgcolor};'>&nbsp;</td>"
   end
 
 end

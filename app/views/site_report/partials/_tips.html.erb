@@ -4,9 +4,11 @@
     <table dir="<%= dir_for_locale %>" border="0" cellpadding="0" cellspacing="0" width="100%" style="font-size:2px;font-weight:400;font-family:Helvetica,Arial,sans-serif !important;border-collapse:collapse;">
       <tr>
         <%= raw(highlight_side_spacer 0) -%>
-        <td style="padding: 20px 0 5px 0; background-color:<%= body_bgcolor -%>; color:<%= body_color -%>;font-size:22px;font-weight:400;font-family:Helvetica,Arial,sans-serif !important;text-align: center">
+        <%= raw(body_side_spacer)%>
+        <td style="padding: 20px 0 5px 0; background-color:<%= body_bgcolor -%>; color:<%= body_color -%>;font-size:22px;font-weight:400;font-family:Helvetica,Arial,sans-serif !important;text-align: <%= direction_for_locale %>;">
           <strong><%= t 'site_report.tips_report_heading' -%></strong>
         </td>
+        <%= raw(body_side_spacer)%>
         <%= raw(highlight_side_spacer 0) -%>
       </tr>
     </table>
@@ -19,26 +21,11 @@
     <table dir="<%= dir_for_locale %>" border="0" cellpadding="0" cellspacing="0" width="100%" style="font-size:2px;font-weight:400;font-family:Helvetica,Arial,sans-serif !important;border-collapse:collapse;">
       <tr>
         <%= raw(side_spacer) -%>
-        <td class="body-side-spacer" width="5%" style="background-color:<%= body_bgcolor -%>;">
-          &nbsp;
+        <%= raw(body_side_spacer)%>
+        <td width="80%" style="background-color:<%= body_bgcolor -%>; color:<%= body_color -%>;font-size:16px;font-weight:400;font-family:Helvetica,Arial,sans-serif !important;text-align: <%= direction_for_locale -%>;">
+          <%= render "/site_report/partials/monthly_tips.html.erb" %>
         </td>
-        <td width="80%" style="padding: 20px 0 5px 0; background-color:<%= body_bgcolor -%>; color:<%= body_color -%>;font-size:16px;font-weight:400;font-family:Helvetica,Arial,sans-serif !important;text-align: <%= direction_for_locale -%>;">
-          <p>
-            This is the first paragraph.
-          </p>
-          <p>
-            This is the second paragraph.
-          </p>
-          <p>This is the third paragraph</p>
-          <ul>
-            <li>item one</li>
-            <li>item two</li>
-            <li>item three</li>
-          </ul>
-        </td>
-        <td class="body-side-spacer" width="5%" style="background-color:<%= body_bgcolor -%>;">
-          &nbsp;
-        </td>
+        <%= raw(body_side_spacer)%>
         <%= raw(side_spacer) -%>
       </tr>
     </table>

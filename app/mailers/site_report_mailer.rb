@@ -1,4 +1,5 @@
 require_relative '../helpers/site_report_helper'
+require_dependency 'email/styles'
 
 class SiteReport::SiteReportMailer < ActionMailer::Base
   attr_accessor :hide_count, :poor_health, :compare_threshold
