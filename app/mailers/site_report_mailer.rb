@@ -129,7 +129,7 @@ class SiteReport::SiteReportMailer < ActionMailer::Base
       subject: subject,
       header_metadata: header_metadata,
       data_array: data_array,
-      report_type: report_type
+      report_type: :stats
     }
 
     admin_emails = User.where(admin: true).map(&:email).select { |e| e.include?('@') }
