@@ -120,8 +120,7 @@ class SiteReport::SiteReportMailer < ActionMailer::Base
       content_data,
     ]
 
-    # todo: set months_ago as an argument to report method
-    subject = site_report_title(1, report_type)
+    subject = site_report_title(1)
 
     @data = {
       period_month: period_month,
