@@ -29,48 +29,13 @@
                 <td>
             <![endif]-->
       <table dir="<%= dir_for_locale %>" class="content" align="center" border="0" cellpadding="0" cellspacing="0" style="font-family:Helvetica,Arial,sans-serif !important;margin:0 auto;border-collapse:collapse;width:100%;max-width:600px;background-color:<%= bg_color -%>">
-        <!-- email content starts here -->
-
-
-        <!-- start of header metadata row -->
         <%= render "/site_report/partials/header_data.html.erb" %>
-        <!-- end of header metadata row -->
-
-
-
         <% if @data[:report_type] == :stats %>
-          <!-- stats data loop -->
           <%= render "/site_report/partials/stats.html.erb" %>
-
         <% else %>
-
           <%= render "/site_report/partials/tips.html.erb" %>
         <% end %>
-
-        <tr>
-          <td>
-            <table dir="<%= dir_for_locale %>" border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse:collapse;font-size:12px;font-weight:400;font-family:Helvetica,Arial,sans-serif !important;">
-              <tr>
-                <td style="background-color:<%= bg_color -%>;font-size:30px;line-height:30px;" width="100%">
-                  &nbsp;
-                </td>
-              </tr>
-              <tr>
-                <td style="background-color:<%= bg_color -%>; color:<%= text_color -%>;font-size:12px;font-weight:400;font-family:Helvetica,Arial,sans-serif !important;text-align:center">
-                  <%= raw(t 'site_report.unsubscribe', site_link: site_link("blue"), email_preferences_link: site_report_link("blue")) %>
-                </td>
-              </tr>
-              <tr>
-                <td style="background-color:<%= bg_color -%>;font-size:30px;line-height:30px;" width="100%">
-                  &nbsp;&nbsp;
-                </td>
-              </tr>
-            </table>
-          </td>
-        </tr>
-
-
-        <!-- email content ends here -->
+       <%= render "/site_report/partials/unsubscribe.html.erb" %>
       </table><!-- end of inner table -->
       <!--[if (gte mso 9)|(IE)]>
       </td>
@@ -80,6 +45,5 @@
     </td>
   </tr>
 </table><!-- end of outer table -->
-
 </body>
 </html>
