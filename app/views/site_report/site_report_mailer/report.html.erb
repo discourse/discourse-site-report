@@ -31,36 +31,12 @@
       <table dir="<%= dir_for_locale %>" class="content" align="center" border="0" cellpadding="0" cellspacing="0" style="font-family:Helvetica,Arial,sans-serif !important;margin:0 auto;border-collapse:collapse;width:100%;max-width:600px;background-color:<%= bg_color -%>">
         <!-- email content starts here -->
 
-        <!-- logo row -->
-        <tr>
-          <td style="padding:24px 0 24px 0;background-color:<%= header_bgcolor -%>;color:<%= header_color -%>;font-size:22px;font-weight:400;font-family:Helvetica,Arial,sans-serif !important;text-align:center;margin:0 auto;">
-            <a href="<%= Discourse.base_url %>" style="color:<%= header_color -%>;font-size:22px;text-decoration:none;">
-              <%- if logo_url.blank? %>
-                <strong><%= SiteSetting.title %></strong>
-              <%- else %>
-                <img src="<%= logo_url %>" width="200" style="clear:both;display:block;width:200px;margin:auto;max-width:100%;outline:0;text-decoration:none;" alt="<%= SiteSetting.title %>">
-              <%- end %>
-            </a>
-          </td>
-        </tr><!-- end of logo row -->
-
-        <!-- header title row -->
-        <tr>
-          <td style="padding:24px 0 12px 0;background-color:<%= highlight_bgcolor -%>;color:<%= highlight_color -%>;font-size:22px;font-weight:400;font-family:Helvetica,Arial,sans-serif !important;text-align: center">
-            <strong><%= @data[:title] -%></strong>
-          </td>
-        </tr><!-- end of header title row -->
 
         <!-- start of header metadata row -->
         <%= render "/site_report/partials/header_data.html.erb" %>
         <!-- end of header metadata row -->
 
-        <!-- horizontal spacer row (blue) --> <!-- font size sets height -->
-        <tr>
-          <td style="background-color:<%= highlight_bgcolor -%>;font-size:24px;font-weight:400;font-family:Helvetica,Arial,sans-serif !important;text-align:center;" width="100%">
-            &nbsp;
-          </td>
-        </tr><!-- end of horizontal spacer row -->
+
 
         <% if @data[:report_type] == :stats %>
           <!-- stats data loop -->
