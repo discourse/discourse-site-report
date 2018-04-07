@@ -25,19 +25,14 @@ after_initialize do
 
   require_dependency 'application_controller'
   class SiteReport::SiteReportController < ::ApplicationController
-    def index
-    end
-
     def preview
-      email = current_user.email
-      SiteReport::SiteReportMailer.report(send_to: email).deliver_now
+      SiteReport::SiteReportMailer.report(send_to: current_user.email).deliver_now
 
       render json: { success: true }
     end
   end
 
   SiteReport::Engine.routes.draw do
-    root to: 'site_report#index', constraints: AdminConstraint.new
     get 'preview', to: 'site_report#preview', constraints: AdminConstraint.new
   end
 
