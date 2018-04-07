@@ -89,11 +89,13 @@ class SiteReport::SiteReportMailer < ActionMailer::Base
       field_hash('posts_liked', period_likes, prev_likes, has_description: false),
       field_hash('posts_flagged', period_flags, prev_flags, has_description: false),
       field_hash('response_time', period_time_to_first_response, prev_time_to_first_response, has_description: true),
-    ].compact
+    ]
 
     if period_accepted_solutions > 0 || prev_accepted_solutions > 0
       user_action_fields << field_hash('solutions', period_accepted_solutions, prev_accepted_solutions, has_description: true)
     end
+
+    user_action_fields = user_action_fields.compact
 
     user_action_data = {
       title_key: 'site_report.user_actions_title',
@@ -113,12 +115,17 @@ class SiteReport::SiteReportMailer < ActionMailer::Base
       fields: content_fields
     }
 
-    data_array = [
-      health_data,
-      user_data,
-      user_action_data,
-      content_data,
-    ]
+    # data_array = [
+    #   health_data,
+    #   user_data,
+    #   user_action_data,
+    #   content_data,
+    # ]
+
+    data_array = []
+    [health_data, user_data, user_action_data, content_data].each do |data|
+      data_array << data if data[:fields].any?
+    end
 
     subject = site_report_title(1)
 
