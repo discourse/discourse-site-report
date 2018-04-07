@@ -131,6 +131,8 @@ class SiteReport::SiteReportMailer < ActionMailer::Base
       report_type: :stats
     }
 
+    puts "DATA #{@data}"
+
     admin_emails = User.where(admin: true).map(&:email).select { |e| e.include?('@') }
     mail_to = send_to ? send_to : admin_emails
     mail(to: mail_to, subject: subject)
@@ -161,7 +163,7 @@ class SiteReport::SiteReportMailer < ActionMailer::Base
         value: current,
         compare: format_compare(compare_value),
         description_key: opts[:has_description] ? "site_report.descriptions.#{key}" : nil,
-        hide: hide
+        # hide: hide
       }
     end
   end
