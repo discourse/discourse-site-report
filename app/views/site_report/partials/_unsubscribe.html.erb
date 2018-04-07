@@ -3,7 +3,7 @@
     <table dir="<%= dir_for_locale %>" border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse:collapse;font-size:12px;font-weight:400;font-family:Helvetica,Arial,sans-serif !important;">
       <tr>
         <td style="background-color:<%= bg_color -%>; color:<%= text_color -%>;font-size:12px;font-weight:400;font-family:Helvetica,Arial,sans-serif !important;text-align:center">
-          <%= raw(t 'site_report.unsubscribe', site_link: site_link("blue"), email_preferences_link: site_report_link("blue")) %>
+          <%= raw(t 'site_report.unsubscribe', site_link: site_link, email_preferences_link: site_report_link) %>
         </td>
       </tr>
       <tr>

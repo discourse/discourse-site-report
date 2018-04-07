@@ -5,6 +5,8 @@ en:
     unsubscribe: "This summary was sent from %{site_link}. To stop receiving theses emails, change your settings %{email_preferences_link}."
     here: "here"
     visit_link: "Visit this link"
+    blog_link_text: "Read more about community development"
+    blog_link: "on our blog"
     stats_title: "Key Statistics for"
     health_section_title: "Health"
     users_section_title: "Users"

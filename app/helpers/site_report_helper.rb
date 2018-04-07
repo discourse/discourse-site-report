@@ -77,12 +77,12 @@ module SiteReportHelper
     end
   end
 
-  def site_link(color)
-    "<a style='text-decoration:none;color:#{color}' href='#{Discourse.base_url}' style='color: #{color}'>#{SiteSetting.title}</a>"
+  def site_link
+    "<a style='text-decoration:none;color:#{anchor_color}' href='#{Discourse.base_url}' style='color: #{anchor_color}'>#{SiteSetting.title}</a>"
   end
 
-  def site_report_link(color)
-    "<a style='text-decoration:none;color:#{color}' href='#{Discourse.base_url}/admin/site_settings/category/plugins?filter=site_report' style='color: #{color}'>#{t 'site_report.here'}</a>"
+  def site_report_link
+    "<a style='text-decoration:none;color:#{anchor_color}' href='#{Discourse.base_url}/admin/site_settings/category/plugins?filter=site_report'>#{t 'site_report.here'}</a>"
   end
 
   def superscript(count)
@@ -107,6 +107,10 @@ module SiteReportHelper
 
   def body_side_spacer
     "<td class='side-spacer' width='5%' style='background-color: #{body_bgcolor};'>&nbsp;</td>"
+  end
+
+  def blog_link(url)
+    "#{t 'site_report.blog_link_text'} <a style='text-decoration:none;color:#{anchor_color}' href='#{url}'>#{t 'site_report.blog_link'}</a>."
   end
 
 end
