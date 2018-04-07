@@ -125,10 +125,8 @@ class SiteReport::SiteReportMailer < ActionMailer::Base
       subject: subject,
       header_metadata: header_metadata,
       data_array: data_array,
-      report_type: :stats
+      report_type: report_type
     }
-
-    puts "DATA #{@data}"
 
     admin_emails = User.where(admin: true).map(&:email).select { |e| e.include?('@') }
     mail_to = send_to ? send_to : admin_emails
