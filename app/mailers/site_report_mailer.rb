@@ -84,8 +84,8 @@ class SiteReport::SiteReportMailer < ActionMailer::Base
     user_action_fields = [
       field_hash('posts_read', period_posts_read, prev_posts_read, has_description: false),
       field_hash('posts_liked', period_likes, prev_likes, has_description: false),
-      field_hash('posts_flagged', period_flags, prev_flags, has_description: false),
-      field_hash('response_time', period_time_to_first_response, prev_time_to_first_response, has_description: true),
+      field_hash('posts_flagged', period_flags, prev_flags, has_description: false, never_hide: true),
+      field_hash('response_time', period_time_to_first_response, prev_time_to_first_response, has_description: true, negative_compare: true),
     ]
 
     if period_accepted_solutions > 0 || prev_accepted_solutions > 0
@@ -144,9 +144,14 @@ class SiteReport::SiteReportMailer < ActionMailer::Base
     @poor_health || @hide_count > 5 ? :tips : :stats
   end
 
+  # Todo: clean this up.
   def field_hash(key, current, previous, opts = {})
     compare_value = compare(current, previous)
-    hide = opts[:negative_compare] ? compare_value && compare_value > -@compare_threshold : compare_value && compare_value < @compare_threshold
+    hide = false
+    unless opts[:never_hide]
+      hide = opts[:negative_compare] ? compare_value && compare_value > -@compare_threshold : compare_value && compare_value < @compare_threshold
+    end
+
     if hide
       @hide_count += 1
       nil
