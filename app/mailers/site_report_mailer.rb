@@ -80,7 +80,6 @@ class SiteReport::SiteReportMailer < ActionMailer::Base
 
     user_data = {
       title_key: 'site_report.users_section_title',
-      hide_section: user_fields.any? ? false : true,
       fields: user_fields
     }
 
@@ -99,7 +98,6 @@ class SiteReport::SiteReportMailer < ActionMailer::Base
 
     user_action_data = {
       title_key: 'site_report.user_actions_title',
-      hide_section: user_action_fields.any? ? false : true,
       fields: user_action_fields
     }
 
@@ -111,16 +109,8 @@ class SiteReport::SiteReportMailer < ActionMailer::Base
 
     content_data = {
       title_key: 'site_report.content_section_title',
-      hide_section: content_fields.any? ? false : true,
       fields: content_fields
     }
-
-    # data_array = [
-    #   health_data,
-    #   user_data,
-    #   user_action_data,
-    #   content_data,
-    # ]
 
     data_array = []
     [health_data, user_data, user_action_data, content_data].each do |data|
@@ -170,7 +160,6 @@ class SiteReport::SiteReportMailer < ActionMailer::Base
         value: current,
         compare: format_compare(compare_value),
         description_key: opts[:has_description] ? "site_report.descriptions.#{key}" : nil,
-        # hide: hide
       }
     end
   end
