@@ -10,8 +10,7 @@ class SiteReport::SiteReportMailer < ActionMailer::Base
   append_view_path Rails.root.join('plugins', 'discourse-site-report', 'app', 'views')
   default from: SiteSetting.notification_email
 
-  def report(send_to: nil)
-
+  def report(months_ago: 1, send_to: nil)
     start_date = 1.month.ago.beginning_of_month
     end_date = 1.month.ago.end_of_month
     previous_start_date = 2.months.ago.beginning_of_month
@@ -55,7 +54,6 @@ class SiteReport::SiteReportMailer < ActionMailer::Base
       { key: 'site_report.active_users', value: period_active_users },
       { key: 'site_report.posts', value: period_posts },
       { key: 'site_report.posts_read', value: period_posts_read }
-
     ]
 
     health_fields = [
@@ -117,7 +115,7 @@ class SiteReport::SiteReportMailer < ActionMailer::Base
       data_array << data if data[:fields].any?
     end
 
-    subject = site_report_title(1)
+    subject = site_report_title(months_ago)
 
     @data = {
       period_month: period_month,
@@ -183,7 +181,6 @@ class SiteReport::SiteReportMailer < ActionMailer::Base
                     period_end: period_end).pluck(:user_id).uniq.count
   end
 
-  # todo: validate
   def daily_average_users(days_in_period, active_users)
     (active_users / days_in_period.to_f).round(2)
   end
