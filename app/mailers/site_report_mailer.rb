@@ -18,11 +18,17 @@ class SiteReport::SiteReportMailer < ActionMailer::Base
     period_month = start_date.strftime('%B')
     days_in_period = end_date.day.to_i
 
+    period_all_users = all_users(start_date)
+    prev_all_users = all_users(previous_start_date)
     period_active_users = active_users(start_date, end_date)
+    prev_active_users = active_users(previous_start_date, previous_end_date)
     period_engaged_users = engaged_users(start_date, end_date)
     prev_engaged_users = engaged_users(previous_start_date, previous_end_date)
-    prev_active_users = active_users(previous_start_date, previous_end_date)
+    period_inactive_users = inactive_users(period_all_users, period_active_users)
+    prev_inactive_users = inactive_users(prev_all_users, prev_active_users)
     period_dau = daily_average_users(days_in_period, period_active_users)
+    period_new_contributors = new_contributors(start_date, end_date)
+    prev_new_contributors = new_contributors(previous_start_date, previous_end_date)
     prev_dau = daily_average_users(30, prev_active_users)
 
     period_visits = user_visits(start_date, end_date)
@@ -61,9 +67,11 @@ class SiteReport::SiteReportMailer < ActionMailer::Base
     health_fields = [
       field_hash('new_users', period_signups, prev_signups, has_description: true),
       field_hash('engaged_users', period_engaged_users, prev_engaged_users, has_description: true),
-      field_hash('active_users', period_active_users, prev_active_users, has_description: true),
       field_hash('topics_created', period_topics, prev_topics, has_description: false),
-      field_hash( 'daily_active_users', period_dau, prev_dau, has_description: true),
+      # field_hash('active_users', period_active_users, prev_active_users, has_description: true),
+      field_hash('inactive_users', period_inactive_users, prev_inactive_users, has_description: true, negative_compare: true),
+      field_hash('new_contributors', period_new_contributors, prev_new_contributors, has_description: true),
+      # field_hash( 'daily_active_users', period_dau, prev_dau, has_description: true),
       field_hash('health', health(period_dau, period_active_users), health(prev_dau, prev_active_users), has_description: true)
     ].compact
 
@@ -74,7 +82,7 @@ class SiteReport::SiteReportMailer < ActionMailer::Base
     }
 
     user_fields = [
-      field_hash('all_users', all_users(end_date), all_users(previous_end_date), has_description: true),
+      field_hash('all_users', period_all_users, prev_all_users, has_description: true),
       field_hash('user_visits', period_visits, prev_period_visits, has_description: true),
       field_hash('mobile_visits', period_mobile_visits, prev_mobile_visits, has_description: true),
 
@@ -254,6 +262,10 @@ class SiteReport::SiteReportMailer < ActionMailer::Base
     unique_likers(period_start, period_end) + unique_posters(period_start, period_end)
   end
 
+  def inactive_users(all_users, active_users)
+    all_users - active_users
+  end
+
   def unique_likers(start_date, end_date)
     PostAction.where("created_at >= :start_date AND created_at <= :end_date AND post_action_type_id = :like_type",
                      start_date: start_date,
@@ -266,6 +278,12 @@ class SiteReport::SiteReportMailer < ActionMailer::Base
   end
 
   # User Actions
+
+  def new_contributors(period_start, period_end)
+    prev_contributors = User.joins(:posts).where("posts.created_at < :period_start AND users.id > 0", period_start: period_start).pluck(:id).uniq
+    current_contributors = User.joins(:posts).where("posts.created_at >= :period_start AND posts.created_at <= :period_end AND users.id > 0", period_start: period_start, period_end: period_end).pluck(:id).uniq
+    (current_contributors - prev_contributors).count
+  end
 
   def posts_read(period_start, period_end)
     UserVisit.where("visited_at >= :period_start AND visited_at <= :period_end",
