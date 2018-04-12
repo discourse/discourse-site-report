@@ -19,6 +19,8 @@ class SiteReport::SiteReportMailer < ActionMailer::Base
     days_in_period = end_date.day.to_i
 
     period_active_users = active_users(start_date, end_date)
+    period_engaged_users = engaged_users(start_date, end_date)
+    prev_engaged_users = engaged_users(previous_start_date, previous_end_date)
     prev_active_users = active_users(previous_start_date, previous_end_date)
     period_dau = daily_average_users(days_in_period, period_active_users)
     prev_dau = daily_average_users(30, prev_active_users)
@@ -58,6 +60,7 @@ class SiteReport::SiteReportMailer < ActionMailer::Base
 
     health_fields = [
       field_hash('new_users', period_signups, prev_signups, has_description: true),
+      field_hash('engaged_users', period_engaged_users, prev_engaged_users, has_description: true),
       field_hash('active_users', period_active_users, prev_active_users, has_description: true),
       field_hash('topics_created', period_topics, prev_topics, has_description: false),
       field_hash( 'daily_active_users', period_dau, prev_dau, has_description: true),
@@ -245,6 +248,21 @@ class SiteReport::SiteReportMailer < ActionMailer::Base
     SQL
 
     ActiveRecord::Base.exec_sql(sql, period_start: period_start, period_end: period_end, num_visits: num_visits).count
+  end
+
+  def engaged_users(period_start, period_end)
+    unique_likers(period_start, period_end) + unique_posters(period_start, period_end)
+  end
+
+  def unique_likers(start_date, end_date)
+    PostAction.where("created_at >= :start_date AND created_at <= :end_date AND post_action_type_id = :like_type",
+                     start_date: start_date,
+                     end_date: end_date,
+                     like_type: PostActionType.types[:like]).pluck(:user_id).uniq.count
+  end
+
+  def unique_posters(start_date, end_date)
+    Post.where("created_at >= :start_date AND created_at <= :end_date", start_date: start_date, end_date: end_date).pluck(:user_id).uniq.count
   end
 
   # User Actions
