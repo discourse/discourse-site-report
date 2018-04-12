@@ -57,7 +57,9 @@ class SiteReport::SiteReportMailer < ActionMailer::Base
     ]
 
     health_fields = [
+      field_hash('new_users', period_signups, prev_signups, has_description: true),
       field_hash('active_users', period_active_users, prev_active_users, has_description: true),
+      field_hash('topics_created', period_topics, prev_topics, has_description: false),
       field_hash( 'daily_active_users', period_dau, prev_dau, has_description: true),
       field_hash('health', health(period_dau, period_active_users), health(prev_dau, prev_active_users), has_description: true)
     ].compact
@@ -72,7 +74,7 @@ class SiteReport::SiteReportMailer < ActionMailer::Base
       field_hash('all_users', all_users(end_date), all_users(previous_end_date), has_description: true),
       field_hash('user_visits', period_visits, prev_period_visits, has_description: true),
       field_hash('mobile_visits', period_mobile_visits, prev_mobile_visits, has_description: true),
-      field_hash('new_users', period_signups, prev_signups, has_description: true),
+
       field_hash('repeat_new_users', period_repeat_new_users, prev_repeat_new_users, has_description: true),
     ].compact
 
@@ -100,7 +102,7 @@ class SiteReport::SiteReportMailer < ActionMailer::Base
     }
 
     content_fields = [
-      field_hash('topics_created', period_topics, prev_topics, has_description: false),
+
       field_hash('posts_created', period_posts, prev_posts, has_description: false),
       field_hash('emails_sent', period_emails_sent, prev_emails_sent, has_description: false),
     ].compact
@@ -123,7 +125,7 @@ class SiteReport::SiteReportMailer < ActionMailer::Base
       subject: subject,
       header_metadata: header_metadata,
       data_array: data_array,
-      report_type: report_type
+      report_type: :stats
     }
 
     admin_emails = User.where(admin: true).map(&:email).select { |e| e.include?('@') }
@@ -136,7 +138,7 @@ class SiteReport::SiteReportMailer < ActionMailer::Base
   def initialize
     super
     @hide_count = 0
-    @compare_threshold = -10
+    @compare_threshold = -1000
     @alternate_report = false
   end
 
