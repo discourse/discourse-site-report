@@ -81,10 +81,30 @@ class SiteReport::SiteReportMailer < ActionMailer::Base
       fields: health_fields
     }
 
+    activity_fields = [
+      field_hash('user_visits', period_visits, prev_period_visits, has_description: true),
+      field_hash('posts_created', period_posts, prev_posts, has_description: false),
+      field_hash('response_time', period_time_to_first_response, prev_time_to_first_response, has_description: true, negative_compare: true),
+      field_hash('posts_liked', period_likes, prev_likes, has_description: false),
+      field_hash('posts_flagged', period_flags, prev_flags, has_description: false, never_hide: true),
+    ]
+
+    if period_accepted_solutions > 0 || prev_accepted_solutions > 0
+      activity_fields << field_hash('solutions', period_accepted_solutions, prev_accepted_solutions, has_description: true)
+    end
+
+    activity_fields = activity_fields.compact
+
+    activity_data = {
+      title_key: 'site_report.activity_section_title',
+      fields: activity_fields
+    }
+
     user_fields = [
       field_hash('all_users', period_all_users, prev_all_users, has_description: true),
       field_hash('user_visits', period_visits, prev_period_visits, has_description: true),
       field_hash('mobile_visits', period_mobile_visits, prev_mobile_visits, has_description: true),
+      field_hash('posts_liked', period_likes, prev_likes, has_description: false),
 
       field_hash('repeat_new_users', period_repeat_new_users, prev_repeat_new_users, has_description: true),
     ].compact
@@ -124,7 +144,7 @@ class SiteReport::SiteReportMailer < ActionMailer::Base
     }
 
     data_array = []
-    [health_data, user_data, user_action_data, content_data].each do |data|
+    [health_data, activity_data].each do |data|
       data_array << data if data[:fields].any?
     end
 
