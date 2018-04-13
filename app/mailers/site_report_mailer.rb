@@ -33,21 +33,21 @@ class SiteReport::SiteReportMailer < ActionMailer::Base
 
     period_visits = user_visits(start_date, end_date)
     prev_period_visits = user_visits(previous_start_date, previous_end_date)
-    period_mobile_visits = user_visits_mobile(start_date, end_date)
-    prev_mobile_visits = user_visits_mobile(previous_start_date, previous_end_date)
     period_signups = signups(start_date, end_date)
     prev_signups = signups(previous_start_date, previous_end_date)
-    period_repeat_new_users = repeat_new_users(start_date, end_date, 2)
-    prev_repeat_new_users = repeat_new_users(previous_start_date, previous_end_date, 2)
 
+    # todo: this is in the header, but should be replaced with something
     period_posts_read = posts_read(start_date, end_date)
-    prev_posts_read = posts_read(previous_start_date, previous_end_date)
     period_likes = likes(start_date, end_date)
     prev_likes = likes(previous_start_date, previous_end_date)
     period_flags = flags(start_date, end_date)
     prev_flags = flags(previous_start_date, previous_end_date)
     period_time_to_first_response = time_to_first_response(start_date, end_date)
     prev_time_to_first_response = time_to_first_response(previous_start_date, previous_end_date)
+    period_average_time_onsite = average_time_onsite(start_date, end_date)
+    prev_average_time_onsite = average_time_onsite(previous_start_date, previous_end_date)
+    period_no_response = topics_with_no_response(start_date, end_date)
+    prev_no_response = topics_with_no_response(previous_start_date, previous_end_date)
     period_accepted_solutions = accepted_solutions(start_date, end_date)
     prev_accepted_solutions = accepted_solutions(previous_start_date, previous_end_date)
 
@@ -55,8 +55,6 @@ class SiteReport::SiteReportMailer < ActionMailer::Base
     prev_topics = topics_created(previous_start_date, previous_end_date)
     period_posts = posts_created(start_date, end_date)
     prev_posts = posts_created(previous_start_date, previous_end_date)
-    period_emails_sent = emails_sent(start_date, end_date)
-    prev_emails_sent = emails_sent(previous_start_date, previous_end_date)
 
     header_metadata = [
       { key: 'site_report.active_users', value: period_active_users },
@@ -68,10 +66,8 @@ class SiteReport::SiteReportMailer < ActionMailer::Base
       field_hash('new_users', period_signups, prev_signups, has_description: true),
       field_hash('engaged_users', period_engaged_users, prev_engaged_users, has_description: true),
       field_hash('topics_created', period_topics, prev_topics, has_description: false),
-      # field_hash('active_users', period_active_users, prev_active_users, has_description: true),
       field_hash('inactive_users', period_inactive_users, prev_inactive_users, has_description: true, negative_compare: true),
       field_hash('new_contributors', period_new_contributors, prev_new_contributors, has_description: true),
-      # field_hash( 'daily_active_users', period_dau, prev_dau, has_description: true),
       field_hash('health', health(period_dau, period_active_users), health(prev_dau, prev_active_users), has_description: true)
     ].compact
 
@@ -85,6 +81,8 @@ class SiteReport::SiteReportMailer < ActionMailer::Base
       field_hash('user_visits', period_visits, prev_period_visits, has_description: true),
       field_hash('posts_created', period_posts, prev_posts, has_description: false),
       field_hash('response_time', period_time_to_first_response, prev_time_to_first_response, has_description: true, negative_compare: true),
+      field_hash('average_time_onsite', period_average_time_onsite, prev_average_time_onsite, has_description: true),
+      field_hash('unanswered_topics', period_no_response, prev_no_response, has_description: true, negative_compare: true),
       field_hash('posts_liked', period_likes, prev_likes, has_description: false),
       field_hash('posts_flagged', period_flags, prev_flags, has_description: false, never_hide: true),
     ]
@@ -98,49 +96,6 @@ class SiteReport::SiteReportMailer < ActionMailer::Base
     activity_data = {
       title_key: 'site_report.activity_section_title',
       fields: activity_fields
-    }
-
-    user_fields = [
-      field_hash('all_users', period_all_users, prev_all_users, has_description: true),
-      field_hash('user_visits', period_visits, prev_period_visits, has_description: true),
-      field_hash('mobile_visits', period_mobile_visits, prev_mobile_visits, has_description: true),
-      field_hash('posts_liked', period_likes, prev_likes, has_description: false),
-
-      field_hash('repeat_new_users', period_repeat_new_users, prev_repeat_new_users, has_description: true),
-    ].compact
-
-    user_data = {
-      title_key: 'site_report.users_section_title',
-      fields: user_fields
-    }
-
-    user_action_fields = [
-      field_hash('posts_read', period_posts_read, prev_posts_read, has_description: false),
-      field_hash('posts_liked', period_likes, prev_likes, has_description: false),
-      field_hash('posts_flagged', period_flags, prev_flags, has_description: false, never_hide: true),
-      field_hash('response_time', period_time_to_first_response, prev_time_to_first_response, has_description: true, negative_compare: true),
-    ]
-
-    if period_accepted_solutions > 0 || prev_accepted_solutions > 0
-      user_action_fields << field_hash('solutions', period_accepted_solutions, prev_accepted_solutions, has_description: true)
-    end
-
-    user_action_fields = user_action_fields.compact
-
-    user_action_data = {
-      title_key: 'site_report.user_actions_title',
-      fields: user_action_fields
-    }
-
-    content_fields = [
-
-      field_hash('posts_created', period_posts, prev_posts, has_description: false),
-      field_hash('emails_sent', period_emails_sent, prev_emails_sent, has_description: false),
-    ].compact
-
-    content_data = {
-      title_key: 'site_report.content_section_title',
-      fields: content_fields
     }
 
     data_array = []
@@ -241,41 +196,8 @@ class SiteReport::SiteReportMailer < ActionMailer::Base
     UserVisit.where("visited_at >= :start_date AND visited_at <= :end_date", start_date: start_date, end_date: end_date).count
   end
 
-  def user_visits_mobile(start_date, end_date)
-    UserVisit.where("visited_at >= :start_date AND visited_at <= :end_date AND mobile = true", start_date: start_date, end_date: end_date).count
-  end
-
   def signups(start_date, end_date)
     User.where("created_at >= :start_date AND created_at <= :end_date", start_date: start_date, end_date: end_date).count
-  end
-
-  def repeat_new_users(period_start, period_end, num_visits)
-    sql = <<~SQL
-      WITH period_new_users AS (
-      SELECT 
-      u.id
-      FROM users u
-      WHERE u.created_at >= :period_start
-      AND u.created_at <= :period_end
-      ),
-      period_visits AS (
-      SELECT
-      uv.user_id,
-      COUNT(1) AS visit_count
-      FROM user_visits uv
-      WHERE uv.visited_at >= :period_start
-      AND uv.visited_at <= :period_end
-      GROUP BY uv.user_id
-      )
-      SELECT
-      pnu.id
-      FROM period_new_users pnu
-      JOIN period_visits pv
-      ON pv.user_id = pnu.id
-      WHERE pv.visit_count >= :num_visits
-    SQL
-
-    ActiveRecord::Base.exec_sql(sql, period_start: period_start, period_end: period_end, num_visits: num_visits).count
   end
 
   def engaged_users(period_start, period_end)
@@ -329,9 +251,20 @@ class SiteReport::SiteReportMailer < ActionMailer::Base
     Topic.time_to_first_response_total(start_date: start_date, end_date: end_date)
   end
 
-  # Todo: this isn't being used
   def topics_with_no_response(start_date, end_date)
     Topic.with_no_response_total(start_date: start_date, end_date: end_date)
+  end
+
+  def average_time_onsite(start_date, end_date)
+    visits = UserVisit.where("visited_at >= :start_date AND visited_at <= :end_date", start_date: start_date, end_date: end_date).pluck(:user_id, :time_read)
+    users = []
+    readtimes = []
+    visits.each do |visit|
+      users << visit[0]
+      readtimes << visit[1]
+    end
+
+    ((readtimes.sum / users.uniq.count) / 60.0).round(2)
   end
 
   # Content Created
@@ -342,10 +275,6 @@ class SiteReport::SiteReportMailer < ActionMailer::Base
 
   def posts_created(start_date, end_date)
     Post.where("created_at >= :start_date AND created_at <= :end_date", start_date: start_date, end_date: end_date).count
-  end
-
-  def emails_sent(start_date, end_date)
-    EmailLog.where("created_at >= :start_date AND created_at <= :end_date", start_date: start_date, end_date: end_date).count
   end
 
   def accepted_solutions(start_date, end_date)

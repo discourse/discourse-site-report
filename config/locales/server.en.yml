@@ -16,6 +16,7 @@ en:
     all_users: "All Users"
     new_users: "New Users"
     user_visits: "User Visits"
+    average_time_onsite: "Average Time Onsite"
     mobile_visits: "Mobile Visits"
     repeat_new_users: "Repeat New Users"
     active_users: "Active Users"
@@ -29,6 +30,7 @@ en:
     posts_liked: "Posts Liked"
     posts_flagged: "Flagged Posts"
     response_time: "Time to First Response"
+    unanswered_topics: "Unanswered Topics"
     solutions: "Accepted Solutions"
     topics_created: "New Topics"
     posts_created: "Posts Created"
@@ -55,4 +57,6 @@ en:
       topics_created: "This is the topics created description."
       posts_created: "This is the posts created description."
       emails_sent: "This is the emails sent description."
+      unanswered_topics: "Topics with no response."
+      average_time_onsite: "The average amount of time your users have spend onsite."
 
