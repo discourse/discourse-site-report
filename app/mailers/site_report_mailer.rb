@@ -11,8 +11,6 @@ class SiteReport::SiteReportMailer < ActionMailer::Base
   default from: SiteSetting.notification_email
 
   def report(send_to: nil)
-    # todo: remove this, it's only used in the title method
-    months_ago = 1
     start_date = 1.month.ago.beginning_of_month
     end_date = 1.month.ago.end_of_month
     previous_start_date = 2.months.ago.beginning_of_month
@@ -21,42 +19,41 @@ class SiteReport::SiteReportMailer < ActionMailer::Base
     days_in_period = end_date.day.to_i
 
     period_all_users = all_users(start_date)
-    prev_all_users = all_users(previous_start_date)
+    previous_all_users = all_users(previous_start_date)
     period_active_users = active_users(start_date, end_date)
-    prev_active_users = active_users(previous_start_date, previous_end_date)
+    previous_active_users = active_users(previous_start_date, previous_end_date)
     period_engaged_users = engaged_users(start_date, end_date)
-    prev_engaged_users = engaged_users(previous_start_date, previous_end_date)
+    previous_engaged_users = engaged_users(previous_start_date, previous_end_date)
     period_inactive_users = inactive_users(period_all_users, period_active_users)
-    prev_inactive_users = inactive_users(prev_all_users, prev_active_users)
+    previous_inactive_users = inactive_users(previous_all_users, previous_active_users)
     period_dau = daily_average_users(days_in_period, period_active_users)
     period_new_contributors = new_contributors(start_date, end_date)
-    prev_new_contributors = new_contributors(previous_start_date, previous_end_date)
-    prev_dau = daily_average_users(30, prev_active_users)
+    previous_new_contributors = new_contributors(previous_start_date, previous_end_date)
+    previous_dau = daily_average_users(30, previous_active_users)
 
     period_visits = user_visits(start_date, end_date)
-    prev_period_visits = user_visits(previous_start_date, previous_end_date)
+    previous_period_visits = user_visits(previous_start_date, previous_end_date)
     period_signups = signups(start_date, end_date)
-    prev_signups = signups(previous_start_date, previous_end_date)
+    previous_signups = signups(previous_start_date, previous_end_date)
 
-    # todo: this is in the header, but should be replaced with something
     period_posts_read = posts_read(start_date, end_date)
     period_likes = likes(start_date, end_date)
-    prev_likes = likes(previous_start_date, previous_end_date)
+    previous_likes = likes(previous_start_date, previous_end_date)
     period_flags = flags(start_date, end_date)
-    prev_flags = flags(previous_start_date, previous_end_date)
+    previous_flags = flags(previous_start_date, previous_end_date)
     period_time_to_first_response = time_to_first_response(start_date, end_date)
-    prev_time_to_first_response = time_to_first_response(previous_start_date, previous_end_date)
+    previous_time_to_first_response = time_to_first_response(previous_start_date, previous_end_date)
     period_average_time_onsite = average_time_onsite(start_date, end_date)
-    prev_average_time_onsite = average_time_onsite(previous_start_date, previous_end_date)
+    previous_average_time_onsite = average_time_onsite(previous_start_date, previous_end_date)
     period_no_response = topics_with_no_response(start_date, end_date)
-    prev_no_response = topics_with_no_response(previous_start_date, previous_end_date)
+    previous_no_response = topics_with_no_response(previous_start_date, previous_end_date)
     period_accepted_solutions = accepted_solutions(start_date, end_date)
-    prev_accepted_solutions = accepted_solutions(previous_start_date, previous_end_date)
+    previous_accepted_solutions = accepted_solutions(previous_start_date, previous_end_date)
 
     period_topics = topics_created(start_date, end_date)
-    prev_topics = topics_created(previous_start_date, previous_end_date)
+    previous_topics = topics_created(previous_start_date, previous_end_date)
     period_posts = posts_created(start_date, end_date)
-    prev_posts = posts_created(previous_start_date, previous_end_date)
+    previous_posts = posts_created(previous_start_date, previous_end_date)
 
     header_metadata = [
       { key: 'site_report.active_users', value: period_active_users },
@@ -65,32 +62,26 @@ class SiteReport::SiteReportMailer < ActionMailer::Base
     ]
 
     health_fields = [
-      field_hash('new_users', period_signups, prev_signups, has_description: true),
-      field_hash('engaged_users', period_engaged_users, prev_engaged_users, has_description: true),
-      field_hash('topics_created', period_topics, prev_topics, has_description: false),
-      field_hash('inactive_users', period_inactive_users, prev_inactive_users, has_description: true, negative_compare: true),
-      field_hash('new_contributors', period_new_contributors, prev_new_contributors, has_description: true),
-      field_hash('health', health(period_dau, period_active_users), health(prev_dau, prev_active_users), has_description: true)
+      field_hash('new_users', period_signups, previous_signups, has_description: true),
+      field_hash('engaged_users', period_engaged_users, previous_engaged_users, has_description: true),
+      field_hash('topics_created', period_topics, previous_topics, has_description: false),
+      field_hash('inactive_users', period_inactive_users, previous_inactive_users, has_description: true, negative_compare: true),
+      field_hash('new_contributors', period_new_contributors, previous_new_contributors, has_description: true),
+      field_hash('health', health(period_dau, period_active_users), health(previous_dau, previous_active_users), has_description: true)
     ].compact
 
-    @poor_health = health_fields.any? ? false : true
-    health_data =  {
-      title_key: 'site_report.health_section_title',
-      fields: health_fields
-    }
-
     activity_fields = [
-      field_hash('user_visits', period_visits, prev_period_visits, has_description: true),
-      field_hash('posts_created', period_posts, prev_posts, has_description: false),
-      field_hash('response_time', period_time_to_first_response, prev_time_to_first_response, has_description: true, negative_compare: true),
-      field_hash('average_time_onsite', period_average_time_onsite, prev_average_time_onsite, has_description: true),
-      field_hash('unanswered_topics', period_no_response, prev_no_response, has_description: true, negative_compare: true),
-      field_hash('posts_liked', period_likes, prev_likes, has_description: false),
-      field_hash('posts_flagged', period_flags, prev_flags, has_description: false, never_hide: true),
+      field_hash('user_visits', period_visits, previous_period_visits, has_description: true),
+      field_hash('posts_created', period_posts, previous_posts, has_description: false),
+      field_hash('response_time', period_time_to_first_response, previous_time_to_first_response, has_description: true, negative_compare: true),
+      field_hash('average_time_onsite', period_average_time_onsite, previous_average_time_onsite, has_description: true),
+      field_hash('unanswered_topics', period_no_response, previous_no_response, has_description: true, negative_compare: true),
+      field_hash('posts_liked', period_likes, previous_likes, has_description: false),
+      field_hash('posts_flagged', period_flags, previous_flags, has_description: false, never_hide: true),
     ]
 
-    if period_accepted_solutions > 0 || prev_accepted_solutions > 0
-      activity_fields << field_hash('solutions', period_accepted_solutions, prev_accepted_solutions, has_description: true)
+    if period_accepted_solutions > 0 || previous_accepted_solutions > 0
+      activity_fields << field_hash('solutions', period_accepted_solutions, previous_accepted_solutions, has_description: true)
     end
 
     activity_fields = activity_fields.compact
@@ -100,12 +91,18 @@ class SiteReport::SiteReportMailer < ActionMailer::Base
       fields: activity_fields
     }
 
+    @poor_health = health_fields.any? ? false : true
+    health_data =  {
+      title_key: 'site_report.health_section_title',
+      fields: health_fields
+    }
+
     data_array = []
     [health_data, activity_data].each do |data|
       data_array << data if data[:fields].any?
     end
 
-    subject = site_report_title(months_ago)
+    subject = site_report_title
 
     @data = {
       period_month: period_month,
@@ -134,14 +131,15 @@ class SiteReport::SiteReportMailer < ActionMailer::Base
     @poor_health || @hide_count > 5 ? :tips : :stats
   end
 
-  # Todo: clean this up.
   def field_hash(key, current, previous, opts = {})
     compare_value = compare(current, previous)
     hide = false
+
     unless opts[:never_hide]
       hide = opts[:negative_compare] ? compare_value && compare_value > -@compare_threshold : compare_value && compare_value < @compare_threshold
     end
 
+    # Return nil if the field is to be hidden.
     if hide
       @hide_count += 1
       nil
@@ -168,8 +166,6 @@ class SiteReport::SiteReportMailer < ActionMailer::Base
     sprintf("%+d%", val)
   end
 
-  # Health
-
   def active_users(period_start, period_end)
     UserVisit.where("visited_at >= :period_start AND visited_at <= :period_end",
                     period_start: period_start,
@@ -187,8 +183,6 @@ class SiteReport::SiteReportMailer < ActionMailer::Base
       0
     end
   end
-
-  # Users
 
   def all_users(end_date)
     User.where("created_at <= ?", end_date).count
@@ -221,12 +215,10 @@ class SiteReport::SiteReportMailer < ActionMailer::Base
     Post.where("created_at >= :start_date AND created_at <= :end_date", start_date: start_date, end_date: end_date).pluck(:user_id).uniq.count
   end
 
-  # User Actions
-
   def new_contributors(period_start, period_end)
-    prev_contributors = User.joins(:posts).where("posts.created_at < :period_start AND users.id > 0", period_start: period_start).pluck(:id).uniq
+    previous_contributors = User.joins(:posts).where("posts.created_at < :period_start AND users.id > 0", period_start: period_start).pluck(:id).uniq
     current_contributors = User.joins(:posts).where("posts.created_at >= :period_start AND posts.created_at <= :period_end AND users.id > 0", period_start: period_start, period_end: period_end).pluck(:id).uniq
-    (current_contributors - prev_contributors).count
+    (current_contributors - previous_contributors).count
   end
 
   def posts_read(period_start, period_end)
@@ -268,8 +260,6 @@ class SiteReport::SiteReportMailer < ActionMailer::Base
 
     ((readtimes.sum / users.uniq.count) / 60.0).round(2)
   end
-
-  # Content Created
 
   def topics_created(start_date, end_date)
     Topic.where("created_at >= :start_date AND created_at <= :end_date", start_date: start_date, end_date: end_date).count
