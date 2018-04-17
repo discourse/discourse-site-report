@@ -10,7 +10,9 @@ class SiteReport::SiteReportMailer < ActionMailer::Base
   append_view_path Rails.root.join('plugins', 'discourse-site-report', 'app', 'views')
   default from: SiteSetting.notification_email
 
-  def report(months_ago: 1, send_to: nil)
+  def report(send_to: nil)
+    # todo: remove this, it's only used in the title method
+    months_ago = 1
     start_date = 1.month.ago.beginning_of_month
     end_date = 1.month.ago.end_of_month
     previous_start_date = 2.months.ago.beginning_of_month
