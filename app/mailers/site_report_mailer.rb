@@ -60,7 +60,7 @@ class SiteReport::SiteReportMailer < ActionMailer::Base
 
     header_metadata = [
       { key: 'site_report.active_users', value: period_active_users },
-      { key: 'site_report.posts', value: period_posts },
+      { key: 'site_report.posts_created', value: period_posts },
       { key: 'site_report.posts_read', value: period_posts_read }
     ]
 
