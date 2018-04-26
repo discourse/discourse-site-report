@@ -110,7 +110,7 @@ class SiteReport::SiteReportMailer < ActionMailer::Base
       subject: subject,
       header_metadata: header_metadata,
       data_array: data_array,
-      report_type: :stats
+      report_type: report_type
     }
 
     admin_emails = User.where(admin: true).map(&:email).select { |e| e.include?('@') }
@@ -123,12 +123,12 @@ class SiteReport::SiteReportMailer < ActionMailer::Base
   def initialize
     super
     @hide_count = 0
-    @compare_threshold = -1000
+    @compare_threshold = -5
     @alternate_report = false
   end
 
   def report_type
-    @poor_health || @hide_count > 5 ? :tips : :stats
+    @poor_health || @hide_count > 3 ? :tips : :stats
   end
 
   def field_hash(key, current, previous, opts = {})
