@@ -78,7 +78,7 @@ module SiteReportHelper
   end
 
   def site_link
-    "<a style='text-decoration:none;color:#{anchor_color}' href='#{Discourse.base_url}' style='color: #{anchor_color}'>#{SiteSetting.title}</a>"
+    "<a style='text-decoration:none;color:#{anchor_color}' href='#{Discourse.base_url}'>#{SiteSetting.title}</a>"
   end
 
   def site_report_link
