@@ -123,7 +123,7 @@ class SiteReport::SiteReportMailer < ActionMailer::Base
   def initialize
     super
     @hide_count = 0
-    @compare_threshold = -5000
+    @compare_threshold = -5
   end
 
   def report_type
