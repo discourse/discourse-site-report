@@ -4,8 +4,7 @@ module ::Jobs
     sidekiq_options 'retry' => true, 'queue' => 'critical'
 
     def execute(args)
-      # Todo: uncomment this and add setting to not deliver mail when plugin is not enabled.
-      # return unless DateTime.now.day == 1
+      return unless DateTime.now.day == 1 && SiteSetting.site_report_enabled
 
       ::SiteReport::SiteReportMailer.report(args).deliver_now
     end
