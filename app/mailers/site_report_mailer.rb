@@ -123,7 +123,7 @@ class SiteReport::SiteReportMailer < ActionMailer::Base
   def initialize
     super
     @hide_count = 0
-    @compare_threshold = -5
+    @compare_threshold = -5000
     @alternate_report = false
   end
 
@@ -157,7 +157,7 @@ class SiteReport::SiteReportMailer < ActionMailer::Base
     return nil if previous == 0
     return 0 if current == previous
 
-    (((current - previous) * 100.0) / previous).round(2)
+    (((current - previous) * 100.0) / previous).round(0)
   end
 
   def format_compare(val)
@@ -173,12 +173,12 @@ class SiteReport::SiteReportMailer < ActionMailer::Base
   end
 
   def daily_average_users(days_in_period, active_users)
-    (active_users / days_in_period.to_f).round(2)
+    (active_users / days_in_period.to_f).round(0)
   end
 
   def health(dau, mau)
     if mau > 0
-      (dau * 100.0/mau).round(2)
+      (dau * 100.0/mau).round(0)
     else
       0
     end
@@ -242,7 +242,7 @@ class SiteReport::SiteReportMailer < ActionMailer::Base
   end
 
   def time_to_first_response(start_date, end_date)
-    Topic.time_to_first_response_total(start_date: start_date, end_date: end_date)
+    Topic.time_to_first_response_total(start_date: start_date, end_date: end_date).round(0)
   end
 
   def topics_with_no_response(start_date, end_date)
@@ -258,7 +258,7 @@ class SiteReport::SiteReportMailer < ActionMailer::Base
       readtimes << visit[1]
     end
 
-    ((readtimes.sum / users.uniq.count) / 60.0).round(2)
+    ((readtimes.sum / users.uniq.count) / 60.0).round(0)
   end
 
   def topics_created(start_date, end_date)

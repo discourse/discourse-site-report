@@ -86,7 +86,7 @@ module SiteReportHelper
   end
 
   def superscript(count)
-    "<sup style='line-height:0;font-size:70%;vertical-align:top;mso-text-raise:50%'>[#{count}]</sup>"
+    "<sup style='line-height:0;font-size:60%;vertical-align:top;mso-text-raise:50%'>[#{count}]</sup>"
   end
 
   def image_url(filename)
