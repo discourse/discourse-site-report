@@ -42,7 +42,7 @@ en:
       posts_read: "This is the posts read description."
       posts_liked: "This is the posts liked description."
       posts_flagged: "This is the flagged description."
-      response_time: "The average time it took for a topic to get a single response."
+      response_time: "The average time in hours to get a response."
       solutions: "The number of accepted solutions."
       topics_created: "This is the topics created description."
       posts_created: "This is the posts created description."

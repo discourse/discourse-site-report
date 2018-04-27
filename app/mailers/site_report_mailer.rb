@@ -124,7 +124,6 @@ class SiteReport::SiteReportMailer < ActionMailer::Base
     super
     @hide_count = 0
     @compare_threshold = -5000
-    @alternate_report = false
   end
 
   def report_type
@@ -242,7 +241,7 @@ class SiteReport::SiteReportMailer < ActionMailer::Base
   end
 
   def time_to_first_response(start_date, end_date)
-    Topic.time_to_first_response_total(start_date: start_date, end_date: end_date).round(0)
+    Topic.time_to_first_response_total(start_date: start_date, end_date: end_date).round(1)
   end
 
   def topics_with_no_response(start_date, end_date)
