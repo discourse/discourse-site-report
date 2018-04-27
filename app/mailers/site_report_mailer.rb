@@ -195,23 +195,23 @@ class SiteReport::SiteReportMailer < ActionMailer::Base
     User.where("created_at >= :start_date AND created_at <= :end_date", start_date: start_date, end_date: end_date).count
   end
 
-  def engaged_users(period_start, period_end)
-    unique_likers(period_start, period_end) + unique_posters(period_start, period_end)
-  end
-
   def inactive_users(all_users, active_users)
     all_users - active_users
   end
 
-  def unique_likers(start_date, end_date)
+  def unique_liker_ids(start_date, end_date)
     PostAction.where("created_at >= :start_date AND created_at <= :end_date AND post_action_type_id = :like_type",
                      start_date: start_date,
                      end_date: end_date,
-                     like_type: PostActionType.types[:like]).pluck(:user_id).uniq.count
+                     like_type: PostActionType.types[:like]).pluck(:user_id).uniq
   end
 
-  def unique_posters(start_date, end_date)
-    Post.where("created_at >= :start_date AND created_at <= :end_date", start_date: start_date, end_date: end_date).pluck(:user_id).uniq.count
+  def unique_poster_ids(start_date, end_date)
+    Post.where("created_at >= :start_date AND created_at <= :end_date", start_date: start_date, end_date: end_date).pluck(:user_id).uniq
+  end
+
+  def engaged_users(start_date, end_date)
+    (unique_liker_ids(start_date, end_date) + unique_poster_ids(start_date, end_date)).uniq.count
   end
 
   def new_contributors(period_start, period_end)
