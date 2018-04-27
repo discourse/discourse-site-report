@@ -1,0 +1,53 @@
+<!-- logo row -->
+<tr>
+  <td style="padding:24px 0 24px 0;background-color:<%= header_bgcolor -%>;color:<%= header_color -%>;font-size:22px;font-weight:400;font-family:Helvetica,Arial,sans-serif !important;text-align:center;margin:0 auto;">
+    <a href="<%= Discourse.base_url %>" style="color:<%= header_color -%>;font-size:22px;text-decoration:none;">
+      <%- if logo_url.blank? %>
+        <strong><%= SiteSetting.title %></strong>
+      <%- else %>
+        <img src="<%= logo_url %>" width="200" style="clear:both;display:block;width:200px;margin:auto;max-width:100%;outline:0;text-decoration:none;" alt="<%= SiteSetting.title %>">
+      <%- end %>
+    </a>
+  </td>
+</tr><!-- end of logo row -->
+
+<!-- header title row -->
+<tr>
+  <td style="padding:24px 0 12px 0;background-color:<%= highlight_bgcolor -%>;color:<%= highlight_color -%>;font-size:22px;font-weight:400;font-family:Helvetica,Arial,sans-serif !important;text-align: center">
+    <strong><%= @data[:title] -%></strong>
+  </td>
+</tr><!-- end of header title row -->
+
+<tr>
+  <td style="font-family:Helvetica,Arial,sans-serif !important;background-color:<%= highlight_bgcolor -%>;color:<%= highlight_color -%>;">
+    <!-- 1 row of 3 cells each containing a 2 row table -->
+    <table dir="<%= dir_for_locale %>" border="0" cellpadding="0" cellspacing="0" width="100%" style="font-family:Helvetica,Arial,sans-serif !important;">
+      <tr>
+        <!-- loop through header_metadata array -->
+        <%- @data[:header_metadata].each do |data| -%>
+          <td>
+            <table dir="<%= dir_for_locale %>" border="0" cellpadding="0" cellspacing="0" width="100%" style="font-family:Helvetica,Arial,sans-serif !important;border-collapse:collapse;">
+              <tr>
+                <td style="padding: 12px 0 6px 0;background-color:<%= highlight_bgcolor -%>;color:<%= highlight_color -%>;font-weight:400;font-size:28px;font-family:Helvetica,Arial,sans-serif !important;text-align:center;">
+                  <strong><%= data[:value] -%></strong>
+                </td>
+              </tr>
+              <tr>
+                <td style="background-color:<%= highlight_bgcolor -%>;color:<%= highlight_color -%>;font-size:14px;font-weight:400;font-family:Helvetica,Arial,sans-serif !important;text-align:center;">
+                  <strong><%= t data[:key] -%></strong>
+                </td>
+              </tr>
+            </table>
+          </td>
+        <%- end -%>
+      </tr>
+    </table>
+  </td>
+</tr>
+
+<!-- horizontal spacer row (blue) --> <!-- font size sets height -->
+<tr>
+  <td style="background-color:<%= highlight_bgcolor -%>;font-size:24px;font-weight:400;font-family:Helvetica,Arial,sans-serif !important;text-align:center;" width="100%">
+    &nbsp;
+  </td>
+</tr><!-- end of horizontal spacer row -->

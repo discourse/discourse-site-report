@@ -7,6 +7,10 @@ module SiteReportHelper
     rtl? ? 'rtl' : 'ltr'
   end
 
+  def direction_for_locale
+    rtl? ? 'right' : 'left'
+  end
+
   def logo_url
     logo_url = SiteSetting.digest_logo_url
     logo_url = SiteSetting.logo_url if logo_url.blank? || logo_url =~ /\.svg$/i
@@ -59,8 +63,8 @@ module SiteReportHelper
     months_ago.month.ago.strftime('%B %Y')
   end
 
-  def site_report_title(months_ago = 1)
-    "#{I18n.t('statistics_digest.title')} #{report_date(months_ago)}"
+  def site_report_title(months_ago: 1)
+    "#{I18n.t('site_report.stats_title')} #{report_date(months_ago)}"
   end
 
   def spacer_color(outer_count, inner_count = 0)
@@ -73,16 +77,40 @@ module SiteReportHelper
     end
   end
 
-  def site_link(color)
-    "<a style='text-decoration:none;color:#{color}' href='#{Discourse.base_url}' style='color: #{color}'>#{SiteSetting.title}</a>"
+  def site_link
+    "<a style='text-decoration:none;color:#{anchor_color}' href='#{Discourse.base_url}'>#{SiteSetting.title}</a>"
   end
 
-  def statistics_digest_link(color)
-    "<a style='text-decoration:none;color:#{color}' href='#{Discourse.base_url}/admin/plugins/admin-statistics-digest' style='color: #{color}'>#{t 'statistics_digest.here'}</a>"
+  def site_report_link
+    "<a style='text-decoration:none;color:#{anchor_color}' href='#{Discourse.base_url}/admin/site_settings/category/plugins?filter=site_report'>#{t 'site_report.here'}</a>"
   end
 
   def superscript(count)
-    "<sup style='line-height:0;font-size:70%;vertical-align:top;mso-text-raise:50%'>[#{count}]</sup>"
+    "<sup style='line-height:0;font-size:60%;vertical-align:top;mso-text-raise:50%'>[#{count}]</sup>"
+  end
+
+  def image_url(filename)
+    "#{Discourse.base_url}/plugins/discourse-site-report/images/#{filename}"
+  end
+
+  def report_image_tag(filename, width: 300, alt: nil)
+    "<img src='#{image_url(filename)}' width='#{width}' alt='#{alt}'>"
+  end
+
+  def highlight_side_spacer(row_count)
+    "<td class='highlight-side-spacer' width='5%' style='background-color: #{spacer_color row_count};'>&nbsp;</td>"
+  end
+
+  def side_spacer
+    "<td class='side-spacer' width='5%' style='background-color: #{bg_color};'>&nbsp;</td>"
+  end
+
+  def body_side_spacer
+    "<td class='side-spacer' width='5%' style='background-color: #{body_bgcolor};'>&nbsp;</td>"
+  end
+
+  def blog_link(url)
+    "#{t 'site_report.blog_link_text'} <a style='text-decoration:none;color:#{anchor_color}' href='#{url}'>#{t 'site_report.blog_link'}</a>."
   end
 
 end

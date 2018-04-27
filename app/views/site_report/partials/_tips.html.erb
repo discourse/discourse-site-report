@@ -1,0 +1,57 @@
+<!-- title  section -->
+<tr>
+  <td style="background-color:<%= body_bgcolor -%>; color:<%= body_color -%>;font-size:22px;font-weight:400;font-family:Helvetica,Arial,sans-serif !important;">
+    <table dir="<%= dir_for_locale %>" border="0" cellpadding="0" cellspacing="0" width="100%" style="font-size:22px;font-weight:400;font-family:Helvetica,Arial,sans-serif !important;border-collapse:collapse;">
+      <tr>
+        <%= raw(highlight_side_spacer 0) -%>
+        <%= raw(body_side_spacer)%>
+        <td style="padding: 20px 0 5px 0; background-color:<%= body_bgcolor -%>; color:<%= body_color -%>;font-size:22px;font-weight:400;font-family:Helvetica,Arial,sans-serif !important;text-align: <%= direction_for_locale %>;">
+          <strong><%= t 'site_report.tips_report_heading' -%></strong>
+        </td>
+        <%= raw(body_side_spacer)%>
+        <%= raw(highlight_side_spacer 0) -%>
+      </tr>
+    </table>
+  </td>
+</tr><!-- end of title section -->
+
+<!-- tips content section -->
+<tr>
+  <td style="background-color:<%= body_bgcolor -%>; color:<%= body_color -%>;font-size:22px;font-weight:400;font-family:Helvetica,Arial,sans-serif !important;">
+    <table dir="<%= dir_for_locale %>" border="0" cellpadding="0" cellspacing="0" width="100%" style="font-size:2px;font-weight:400;font-family:Helvetica,Arial,sans-serif !important;border-collapse:collapse;">
+      <tr>
+        <%= raw(side_spacer) -%>
+        <%= raw(body_side_spacer)%>
+        <td width="80%" style="background-color:<%= body_bgcolor -%>; color:<%= body_color -%>;font-size:16px;font-weight:400;font-family:Helvetica,Arial,sans-serif !important;text-align: <%= direction_for_locale -%>;">
+          <%= render "/site_report/partials/monthly_tips.html.erb" %>
+        </td>
+        <%= raw(body_side_spacer)%>
+        <%= raw(side_spacer) -%>
+      </tr>
+      <tr>
+        <%= raw(side_spacer) -%>
+        <%= raw(body_side_spacer)%>
+        <td width="80%" style="background-color:<%= body_bgcolor -%>; color:<%= body_color -%>;font-size:16px;font-weight:400;font-family:Helvetica,Arial,sans-serif !important;text-align: <%= direction_for_locale -%>;">
+            <%= raw(blog_link 'https://blog.discourse.org/category/culture/') %>
+        </td>
+        <%= raw(body_side_spacer)%>
+        <%= raw(side_spacer) -%>
+      </tr>
+    </table>
+    <table dir="<%= dir_for_locale %>" border="0" cellpadding="0" cellspacing="0" width="100%" style="font-size:22px;font-weight:400;font-family:Helvetica,Arial,sans-serif !important;border-collapse:collapse;">
+      <!-- horizontal spacer row font size sets height -->
+      <tr>
+        <%= raw(side_spacer) -%>
+        <td style="background-color:<%= body_bgcolor -%>;font-size:24px;font-weight:400;font-family:Helvetica,Arial,sans-serif !important;text-align:center;" width="90%">
+          &nbsp;
+        </td>
+        <%= raw(side_spacer) -%>
+      </tr><!-- end of horizontal spacer row -->
+    </table>
+  </td>
+</tr><!-- end of tips content section -->
+<tr>
+  <td style="background-color:<%= bg_color -%>;font-size:30px;line-height:30px;" width="100%">
+    &nbsp;
+  </td>
+</tr><!-- end of horizontal spacer row -->
