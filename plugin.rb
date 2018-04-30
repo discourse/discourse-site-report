@@ -23,8 +23,8 @@ after_initialize do
     '../../discourse-site-report/app/jobs/site_report.rb'
   ].each { |path| load File.expand_path(path, __FILE__) }
 
-  require_dependency 'application_controller'
-  class SiteReport::SiteReportController < ::ApplicationController
+  require_dependency 'admin/admin_controller'
+  class SiteReport::SiteReportController < ::Admin::AdminController
     def preview
       SiteReport::SiteReportMailer.report(send_to: current_user.email).deliver_now
 

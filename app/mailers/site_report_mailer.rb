@@ -8,7 +8,7 @@ class SiteReport::SiteReportMailer < ActionMailer::Base
   include SiteReportHelper
   add_template_helper SiteReportHelper
   append_view_path Rails.root.join('plugins', 'discourse-site-report', 'app', 'views')
-  default from: SiteSetting.notification_email
+  default from: SiteSetting.notification_email, charset: 'UTF-8'
 
   def report(send_to: nil)
     start_date = 1.month.ago.beginning_of_month
@@ -114,6 +114,7 @@ class SiteReport::SiteReportMailer < ActionMailer::Base
     }
 
     admin_emails = User.where(admin: true).map(&:email).select { |e| e.include?('@') }
+
     mail_to = send_to ? send_to : admin_emails
     mail(to: mail_to, subject: subject)
   end
@@ -261,11 +262,11 @@ class SiteReport::SiteReportMailer < ActionMailer::Base
   end
 
   def topics_created(start_date, end_date)
-    Topic.where("created_at >= :start_date AND created_at <= :end_date", start_date: start_date, end_date: end_date).count
+    Topic.listable_topics.where("topics.created_at >= :start_date AND topics.created_at <= :end_date", start_date: start_date, end_date: end_date).count
   end
 
   def posts_created(start_date, end_date)
-    Post.where("created_at >= :start_date AND created_at <= :end_date", start_date: start_date, end_date: end_date).count
+    Post.public_posts.where("posts.created_at >= :start_date AND posts.created_at <= :end_date", start_date: start_date, end_date: end_date).count
   end
 
   def accepted_solutions(start_date, end_date)
