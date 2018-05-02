@@ -114,6 +114,7 @@ class SiteReport::SiteReportMailer < ActionMailer::Base
     }
 
     admin_emails = User.where(admin: true).map(&:email).select { |e| e.include?('@') }
+    admin_emails.delete_if { |x| /@discourse.org$/ =~ x }
 
     mail_to = send_to ? send_to : admin_emails
     mail(to: mail_to, subject: subject)
