@@ -103,21 +103,27 @@ class SiteReport::SiteReportMailer < ActionMailer::Base
     end
 
     subject = site_report_title
+    report_type = get_report_type
 
-    @data = {
-      period_month: period_month,
-      title: subject,
-      subject: subject,
-      header_metadata: header_metadata,
-      data_array: data_array,
-      report_type: report_type
-    }
+    # The plugin can eventually include a :tips report for sites that are not doing well. For now, the report is only
+    # sent when the site's data is good.
 
-    admin_emails = User.where(admin: true).map(&:email).select { |e| e.include?('@') }
-    admin_emails.delete_if { |x| /@discourse.org$/ =~ x }
+    if :stats == report_type
+      @data = {
+        period_month: period_month,
+        title: subject,
+        subject: subject,
+        header_metadata: header_metadata,
+        data_array: data_array,
+        report_type: report_type
+      }
 
-    mail_to = send_to ? send_to : admin_emails
-    mail(to: mail_to, subject: subject)
+      admin_emails = User.where(admin: true).map(&:email).select { |e| e.include?('@') }
+      admin_emails.delete_if { |x| /@discourse.org$/ =~ x }
+
+      mail_to = send_to ? send_to : admin_emails
+      mail(to: mail_to, subject: subject)
+    end
   end
 
   private
@@ -128,7 +134,7 @@ class SiteReport::SiteReportMailer < ActionMailer::Base
     @compare_threshold = -5
   end
 
-  def report_type
+  def get_report_type
     @poor_health || @hide_count > 3 ? :tips : :stats
   end
 
