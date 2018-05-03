@@ -215,7 +215,7 @@ class SiteReport::SiteReportMailer < ActionMailer::Base
   end
 
   def unique_poster_ids(start_date, end_date)
-    Post.where("created_at >= :start_date AND created_at <= :end_date", start_date: start_date, end_date: end_date).pluck(:user_id).uniq
+    Post.public_posts.where("posts.created_at >= :start_date AND posts.created_at <= :end_date", start_date: start_date, end_date: end_date).pluck(:user_id).uniq
   end
 
   def engaged_users(start_date, end_date)
