@@ -45,8 +45,8 @@ class SiteReport::SiteReportMailer < ActionMailer::Base
     previous_time_to_first_response = time_to_first_response(previous_start_date, previous_end_date)
     period_average_time_onsite = average_time_onsite(start_date, end_date)
     previous_average_time_onsite = average_time_onsite(previous_start_date, previous_end_date)
-    period_no_response = topics_with_no_response(start_date, end_date)
-    previous_no_response = topics_with_no_response(previous_start_date, previous_end_date)
+    period_no_response = topics_with_no_response(end_date)
+    previous_no_response = topics_with_no_response(previous_end_date)
     period_accepted_solutions = accepted_solutions(start_date, end_date)
     previous_accepted_solutions = accepted_solutions(previous_start_date, previous_end_date)
 
@@ -252,8 +252,29 @@ class SiteReport::SiteReportMailer < ActionMailer::Base
     Topic.time_to_first_response_total(start_date: start_date, end_date: end_date).round(1)
   end
 
-  def topics_with_no_response(start_date, end_date)
-    Topic.with_no_response_total(start_date: start_date, end_date: end_date)
+  def topics_with_no_response(end_date)
+    sql = <<-SQL
+WITH topics_and_first_replies AS (
+SELECT
+MIN(p.post_number) AS first_reply,
+MIN(p.created_at) AS created_at
+FROM topics t
+LEFT JOIN posts p
+ON p.topic_id = t.id
+AND p.user_id != t.user_id
+AND p.deleted_at IS NULL
+AND p.post_type = 1
+WHERE t.archetype = 'regular'
+AND t.deleted_at IS NULL
+GROUP BY t.id
+)
+SELECT COUNT(*) AS count
+FROM topics_and_first_replies tfr
+WHERE tfr.first_reply IS NULL
+OR tfr.created_at > '#{end_date}'
+    SQL
+
+    ActiveRecord::Base.connection.execute(sql).first['count']
   end
 
   def average_time_onsite(start_date, end_date)
