@@ -1,5 +1,7 @@
 # name: discourse-site-report
+# about: Sends a monthly statistics report to the site admins
 # version: 0.1
+# authors: Simon Cossar
 
 enabled_site_setting :site_report_enabled
 
