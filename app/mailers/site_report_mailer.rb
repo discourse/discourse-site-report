@@ -137,7 +137,7 @@ class SiteReport::SiteReportMailer < ActionMailer::Base
   end
 
   def get_report_type
-    @poor_health || @hide_count > 3 ? :tips : :stats
+    @poor_health || @hide_count > 5 ? :tips : :stats
   end
 
   def field_hash(key, current, previous, opts = {})
