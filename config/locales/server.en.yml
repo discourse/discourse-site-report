@@ -39,7 +39,7 @@ en:
       engaged_users: "Users who have liked or created a post."
       inactive_users: "Registered users who have not visited your forum during the report period."
       new_contributors: "Users who created their first post during the report period."
-      response_time: "The average time in hours to get a response."
+      response_time: "The average time in hours to get a response to topics created in the report period."
       solutions: "The number of topics that have been marked as solved by the original poster."
       unanswered_topics: "Topics with no response."
       average_time_onsite: "The average time in hours that active users have spend onsite."
