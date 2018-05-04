@@ -288,7 +288,11 @@ OR tfr.created_at > '#{end_date}'
       readtimes << visit[1]
     end
 
-    ((readtimes.sum / users.uniq.count) / 60.0).round(1)
+    user_count = users.uniq.count
+
+    return 0 if user_count == 0
+
+    ((readtimes.sum / user_count) / 60.0).round(1)
   end
 
   def topics_created(start_date, end_date)
