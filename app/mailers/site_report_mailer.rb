@@ -187,7 +187,7 @@ class SiteReport::SiteReportMailer < ActionMailer::Base
 
   def health(dau, mau)
     if mau > 0
-      (dau * 100.0/mau).round(1)
+      (dau * 100.0 / mau).round(1)
     else
       0
     end
