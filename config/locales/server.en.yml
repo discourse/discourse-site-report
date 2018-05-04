@@ -42,4 +42,4 @@ en:
       response_time: "The average time in hours to get a response."
       solutions: "The number of accepted solutions."
       unanswered_topics: "Topics with no response."
-      average_time_onsite: "The average time in hours users have spend onsite."
+      average_time_onsite: "The average time in hours that active users have spend onsite."
