@@ -35,7 +35,7 @@ en:
       user_visits: "Recorded once per day per user."
       active_users: "Users who have visited at least once."
       daily_active_users: "The average number of unique visits to your forum for the month."
-      health: "The percentage of your site\'s active users who visit on a daily basis. DAU/MAU is a commonly used metric to understand your community's \"Stickiness\" - how often users return to your forum."
+      health: "The percentage of your sites active users who visit on a daily basis. DAU/MAU is a commonly used metric to understand your community's \"Stickiness\" - how often users return to your forum."
       engaged_users: "Users who have liked or created a post."
       inactive_users: "Registered users who have not visited your forum during the report period."
       new_contributors: "Users who created their first post during the report period."
